@@ -1,42 +1,118 @@
 # Welcome to GRCWA Documentation
 
-<div align="center">
-  <img src="../imag/scheme.png" alt="RCWA Structure" style="max-width: 600px;">
+<div align="center" markdown>
+
+![RCWA Structure](../imag/scheme.png){ width="600" loading=lazy }
+
+**Autograd-enabled Rigorous Coupled Wave Analysis for Photonic Crystals**
+
+[:octicons-mark-github-16: GitHub](https://github.com/weiliangjinca/grcwa){ .md-button .md-button--primary }
+[:fontawesome-brands-python: PyPI](https://pypi.org/project/grcwa/){ .md-button }
+[:octicons-book-16: Read the Docs](https://grcwa.readthedocs.io){ .md-button }
+
 </div>
+
+---
 
 ## What is GRCWA?
 
-**GRCWA** (autoGradable Rigorous Coupled Wave Analysis) is a powerful Python library for simulating light interaction with periodic photonic structures. It implements the Rigorous Coupled Wave Analysis (RCWA) method with full support for automatic differentiation, making it ideal for inverse design and optimization of photonic devices.
+!!! abstract "Overview"
+    **GRCWA** (autoGradable Rigorous Coupled Wave Analysis) is a powerful Python library for simulating light interaction with periodic photonic structures. It implements the Rigorous Coupled Wave Analysis (RCWA) method with full support for automatic differentiation, making it ideal for inverse design and optimization of photonic devices.
 
-## Key Features
+## :material-features: Key Features
 
-### 🔬 Physics-Based Simulation
-- Rigorous electromagnetic wave simulation using Maxwell's equations
-- Support for arbitrarily shaped 2D periodic photonic structures
-- Multiple layer support with independent dielectric profiles
-- Full vectorial field calculations
+### :microscope: Physics-Based Simulation
 
-### 🎯 Arbitrary Geometries
-- **Uniform layers**: Simple dielectric slabs
-- **Grid-based patterns**: Any 2D pattern with Cartesian grids
-- **Analytical Fourier series**: Efficient for simple shapes
-- Support for both isotropic and anisotropic materials
+<div class="grid cards" markdown>
 
-### 🚀 Automatic Differentiation
-- Integrated with [Autograd](https://github.com/HIPS/autograd) for automatic gradient computation
-- Gradients with respect to:
-    - Dielectric constants at every grid point
-    - Layer thicknesses
-    - Operating frequency
-    - Incident angles
-    - Lattice periodicity
-- Enables efficient gradient-based optimization
+-   :fontawesome-solid-wave-square: __Rigorous Simulation__
 
-### 📐 Flexible Lattices
-- Square lattices
-- Hexagonal lattices
-- Arbitrary oblique lattices
-- Configurable truncation orders
+    ---
+
+    Solve Maxwell's equations exactly using Fourier modal method
+
+    - Full vectorial field calculations
+    - Arbitrary 2D periodic structures
+    - Multiple layer stacking
+
+-   :material-layers-triple: __Multiple Layers__
+
+    ---
+
+    Support complex multilayer structures
+
+    - Independent dielectric profiles
+    - Uniform and patterned layers
+    - Unlimited layer count
+
+</div>
+
+### :dart: Arbitrary Geometries
+
+=== "Uniform Layers"
+
+    Simple dielectric slabs with constant permittivity
+
+    ```python
+    obj.Add_LayerUniform(thickness=0.5, epsilon=4.0)
+    ```
+
+=== "Grid-Based Patterns"
+
+    Any 2D pattern with Cartesian grids
+
+    ```python
+    obj.Add_LayerGrid(thickness=0.3, Nx=400, Ny=400)
+    obj.GridLayer_geteps(epsilon_grid.flatten())
+    ```
+
+=== "Analytical Fourier"
+
+    Efficient for shapes with known Fourier series
+
+    ```python
+    obj.Add_LayerFourier(thickness=0.2, params)
+    ```
+
+### :rocket: Automatic Differentiation
+
+!!! tip "Gradient-Based Optimization"
+    Integrated with [Autograd](https://github.com/HIPS/autograd) for automatic gradient computation
+
+**Autogradable Parameters:**
+
+- [x] Dielectric constants at every grid point
+- [x] Layer thicknesses
+- [x] Operating frequency
+- [x] Incident angles
+- [x] Lattice periodicity
+
+### :triangular_ruler: Flexible Lattices
+
+<div class="grid cards" markdown>
+
+-   __Square__
+
+    ```python
+    L1 = [a, 0]
+    L2 = [0, a]
+    ```
+
+-   __Hexagonal__
+
+    ```python
+    L1 = [a, 0]
+    L2 = [a/2, a*√3/2]
+    ```
+
+-   __Arbitrary__
+
+    ```python
+    L1 = [Lx1, Ly1]
+    L2 = [Lx2, Ly2]
+    ```
+
+</div>
 
 ## What Can You Do with GRCWA?
 

@@ -33,6 +33,8 @@ jobs:
           pip install mkdocs-material
           pip install mkdocstrings[python]
           pip install pymdown-extensions
+          pip install mkdocs-git-revision-date-localized-plugin
+          pip install pillow cairosvg
 
       - name: Build and deploy
         run: mkdocs gh-deploy --force

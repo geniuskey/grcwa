@@ -3,12 +3,14 @@ site_description: Autograd-enabled Rigorous Coupled Wave Analysis for Photonic C
 site_author: Weiliang Jin
 repo_url: https://github.com/weiliangjinca/grcwa
 repo_name: weiliangjinca/grcwa
+copyright: Copyright &copy; 2020 Weiliang Jin - GPL v3 License
 
 docs_dir: docs_mkdocs
 site_dir: site
 
 theme:
   name: material
+  language: en
   palette:
     # Palette toggle for light mode
     - scheme: default
@@ -24,42 +26,153 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
   features:
+    # Navigation
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
+    - navigation.path
+    - navigation.indexes
     - navigation.top
+    - navigation.footer
+    - navigation.tracking
+    # Table of contents
+    - toc.follow
+    - toc.integrate
+    # Search
     - search.suggest
     - search.highlight
+    - search.share
+    # Content
     - content.code.copy
     - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    # Header
+    - header.autohide
+    # Announce bar
+    - announce.dismiss
   icon:
     repo: fontawesome/brands/github
+    logo: material/waves
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
 
 plugins:
-  - search
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
   - mkdocstrings:
       handlers:
         python:
           options:
             docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            members_order: source
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
 
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.arithmatex:
-      generic: true
+  # Python Markdown
+  - abbr
   - admonition
-  - pymdownx.details
   - attr_list
+  - def_list
+  - footnotes
   - md_in_html
+  - tables
   - toc:
       permalink: true
+      toc_depth: 4
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: weiliangjinca
+      repo: grcwa
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra:
+  homepage: https://github.com/weiliangjinca/grcwa
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/weiliangjinca/grcwa
+      name: GRCWA on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/grcwa/
+      name: GRCWA on PyPI
+    - icon: fontawesome/solid/paper-plane
+      link: mailto:jwlaaa@gmail.com
+      name: Contact
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >-
+            Thanks for your feedback! Help us improve by
+            <a href="https://github.com/weiliangjinca/grcwa/issues/new" target="_blank" rel="noopener">opening an issue</a>.
+  version:
+    provider: mike
+    default: latest
 
 extra_javascript:
   - javascripts/mathjax.js
