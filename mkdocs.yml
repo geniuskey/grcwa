@@ -1,0 +1,114 @@
+site_name: GRCWA Documentation
+site_description: Autograd-enabled Rigorous Coupled Wave Analysis for Photonic Crystals
+site_author: Weiliang Jin
+repo_url: https://github.com/weiliangjinca/grcwa
+repo_name: weiliangjinca/grcwa
+
+docs_dir: docs_mkdocs
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Introduction: introduction.md
+    - Installation: installation.md
+    - Quick Start: quickstart.md
+  - Theory:
+    - Physical Principles: theory/principles.md
+    - Mathematical Formulation: theory/mathematics.md
+    - RCWA Algorithm: theory/algorithm.md
+  - User Guide:
+    - Basic Concepts: guide/concepts.md
+    - Layer Definition: guide/layers.md
+    - Excitation Setup: guide/excitation.md
+    - Computing Results: guide/results.md
+    - Field Analysis: guide/fields.md
+  - API Reference:
+    - Core Classes: api/core.md
+    - Layer Methods: api/layers.md
+    - Solver Methods: api/solver.md
+    - Field Methods: api/fields.md
+    - Utility Functions: api/utilities.md
+  - Tutorials:
+    - Tutorial 1 - Simple Slab: tutorials/tutorial1.md
+    - Tutorial 2 - Patterned Layer: tutorials/tutorial2.md
+    - Tutorial 3 - Multiple Layers: tutorials/tutorial3.md
+    - Tutorial 4 - Hexagonal Lattice: tutorials/tutorial4.md
+    - Tutorial 5 - Optimization: tutorials/tutorial5.md
+  - Examples:
+    - Gallery: examples/gallery.md
+    - Square Lattice Holes: examples/ex1.md
+    - Two Patterned Layers: examples/ex2.md
+    - Topology Optimization: examples/ex3.md
+    - Hexagonal Lattice: examples/ex4.md
+  - Advanced Topics:
+    - Automatic Differentiation: advanced/autograd.md
+    - Gradient Computation: advanced/gradients.md
+    - Optimization: advanced/optimization.md
+  - Reference:
+    - Variables & Conventions: reference/variables.md
+    - Physical Units: reference/units.md
+    - Troubleshooting: reference/troubleshooting.md
+    - FAQ: reference/faq.md
