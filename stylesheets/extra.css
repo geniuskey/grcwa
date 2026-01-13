@@ -1,0 +1,374 @@
+/* ====================================
+   GRCWA Documentation Custom Styles
+   ==================================== */
+
+:root {
+  --grcwa-primary: #3f51b5;
+  --grcwa-accent: #ff4081;
+  --grcwa-code-bg: #f5f5f5;
+}
+
+/* ====================================
+   Code Blocks & Syntax Highlighting
+   ==================================== */
+.highlight {
+    border-radius: 6px;
+    margin: 1.5em 0;
+}
+
+.highlight pre {
+    border-radius: 6px;
+    padding: 1em;
+}
+
+/* Code inline styling */
+.md-typeset code {
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+    background-color: var(--grcwa-code-bg);
+}
+
+/* ====================================
+   Grid Cards
+   ==================================== */
+.grid.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.grid.cards > * {
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 8px;
+    padding: 1.8rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--md-code-bg-color);
+}
+
+.grid.cards > *:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
+    border-color: var(--md-primary-fg-color);
+}
+
+/* ====================================
+   Tables
+   ==================================== */
+.md-typeset table:not([class]) {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 2rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.md-typeset table:not([class]) th {
+    background-color: var(--md-primary-fg-color);
+    color: var(--md-primary-bg-color);
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+}
+
+.md-typeset table:not([class]) td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset table:not([class]) tr:last-child td {
+    border-bottom: none;
+}
+
+.md-typeset table:not([class]) tr:hover {
+    background-color: var(--md-code-bg-color);
+}
+
+/* Center checkmarks and icons */
+.md-typeset table td:has(> :is(.twemoji, [class*="emoji"])) {
+    text-align: center;
+    font-size: 1.3em;
+}
+
+/* ====================================
+   Math Equations
+   ==================================== */
+.arithmatex {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem 0;
+}
+
+mjx-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* ====================================
+   Admonitions
+   ==================================== */
+.md-typeset .admonition,
+.md-typeset details {
+    margin: 2rem 0;
+    border-radius: 6px;
+    border-left: 4px solid;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.md-typeset .admonition-title,
+.md-typeset summary {
+    font-weight: 600;
+    padding-left: 3rem;
+}
+
+/* ====================================
+   Definition Lists
+   ==================================== */
+.md-typeset dt {
+    font-weight: 700;
+    margin-top: 1.5rem;
+    color: var(--md-primary-fg-color);
+}
+
+.md-typeset dd {
+    margin-left: 2.5rem;
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--md-default-fg-color--lightest);
+}
+
+/* ====================================
+   Images
+   ==================================== */
+.md-typeset img[alt$="center"] {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.md-typeset img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ====================================
+   Buttons & Links
+   ==================================== */
+.md-typeset .md-button {
+    border-radius: 6px;
+    padding: 0.625rem 1.25rem;
+    transition: all 0.2s;
+}
+
+.md-typeset .md-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.md-typeset .md-button--primary {
+    background-color: var(--md-primary-fg-color);
+    border-color: var(--md-primary-fg-color);
+}
+
+/* ====================================
+   Task Lists
+   ==================================== */
+.md-typeset .task-list-item {
+    list-style: none;
+}
+
+.md-typeset .task-list-control {
+    margin-right: 0.5rem;
+}
+
+/* ====================================
+   Footnotes
+   ==================================== */
+.md-typeset .footnote {
+    font-size: 0.85em;
+    color: var(--md-default-fg-color--light);
+}
+
+/* ====================================
+   Keyboard Keys
+   ==================================== */
+.md-typeset kbd {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.85em;
+    border-radius: 4px;
+    border: 1px solid var(--md-default-fg-color--lighter);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ====================================
+   Critic Markup
+   ==================================== */
+.md-typeset .critic.comment {
+    color: var(--md-default-fg-color--light);
+}
+
+.md-typeset mark {
+    background-color: #ffeb3b;
+    color: inherit;
+    padding: 0.1rem 0.2rem;
+    border-radius: 2px;
+}
+
+/* ====================================
+   Progress Bars
+   ==================================== */
+.md-typeset progress {
+    width: 100%;
+    height: 1.5rem;
+    border-radius: 4px;
+}
+
+/* ====================================
+   Mermaid Diagrams
+   ==================================== */
+.mermaid {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+/* ====================================
+   Tabbed Content
+   ==================================== */
+.md-typeset .tabbed-set {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.md-typeset .tabbed-labels {
+    border-bottom: 2px solid var(--md-default-fg-color--lightest);
+}
+
+/* ====================================
+   Navigation Breadcrumbs
+   ==================================== */
+.md-path {
+    color: var(--md-default-fg-color--light);
+}
+
+/* ====================================
+   Search Highlighting
+   ==================================== */
+.md-typeset mark {
+    background-color: var(--md-accent-fg-color);
+    color: var(--md-accent-bg-color);
+}
+
+/* ====================================
+   Responsive Design
+   ==================================== */
+@media screen and (max-width: 76.1875em) {
+    .grid.cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 44.9375em) {
+    .md-typeset table:not([class]) {
+        font-size: 0.85em;
+    }
+
+    .md-typeset table:not([class]) th,
+    .md-typeset table:not([class]) td {
+        padding: 0.5rem;
+    }
+}
+
+/* ====================================
+   Dark Mode Adjustments
+   ==================================== */
+[data-md-color-scheme="slate"] {
+    --grcwa-code-bg: rgba(255, 255, 255, 0.05);
+}
+
+[data-md-color-scheme="slate"] .md-typeset img {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+[data-md-color-scheme="slate"] .grid.cards > * {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ====================================
+   Print Styles
+   ==================================== */
+@media print {
+    .md-header,
+    .md-tabs,
+    .md-footer {
+        display: none;
+    }
+
+    .md-typeset img {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+/* ====================================
+   Accessibility
+   ==================================== */
+.md-typeset :focus-visible {
+    outline: 2px solid var(--md-primary-fg-color);
+    outline-offset: 2px;
+}
+
+/* ====================================
+   Custom Animations
+   ==================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.md-typeset .admonition {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* ====================================
+   Version Badge
+   ==================================== */
+.md-version__current {
+    font-weight: 600;
+}
+
+/* ====================================
+   Social Links
+   ==================================== */
+.md-social__link svg {
+    max-height: 1.2rem;
+}
+
+/* ====================================
+   Custom Classes
+   ==================================== */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.highlight-box {
+    padding: 1.5rem;
+    border-left: 4px solid var(--md-primary-fg-color);
+    background-color: var(--md-code-bg-color);
+    border-radius: 6px;
+    margin: 2rem 0;
+}
