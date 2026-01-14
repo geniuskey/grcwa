@@ -678,54 +678,479 @@ verify_energy_conservation(obj)
 
 ### 2. 실측 데이터와 비교
 
+#### 2.1 실측 데이터 형식 및 로딩
+
+실측 QE 데이터는 보통 다음 형식 중 하나입니다:
+
+**CSV 형식 예시:**
+```csv
+# sensor_QE_data.csv
+Wavelength_nm,R_QE,G_QE,B_QE,R_std,G_std,B_std
+400,0.12,0.15,0.45,0.01,0.01,0.02
+450,0.25,0.35,0.65,0.02,0.02,0.03
+500,0.45,0.55,0.35,0.02,0.03,0.02
+...
+```
+
+**엑셀 형식:**
+- Sheet 1: R pixel QE vs wavelength
+- Sheet 2: G pixel QE vs wavelength
+- Sheet 3: B pixel QE vs wavelength
+
 ```python
-def compare_with_measurement(simulated_QE, measured_QE, wavelengths):
+import pandas as pd
+import numpy as np
+from scipy import interpolate
+from scipy.optimize import curve_fit
+
+def load_measured_QE_from_csv(filename, wavelength_col='Wavelength_nm'):
     """
-    시뮬레이션과 실측 QE 비교
+    CSV 파일에서 실측 QE 데이터 로딩
 
     Parameters:
     -----------
-    simulated_QE : dict
-        {'R': [...], 'G': [...], 'B': [...]}
-    measured_QE : dict
-        실측 데이터 (동일 형식)
-    wavelengths : array
-        파장 배열
+    filename : str
+        CSV 파일 경로
+    wavelength_col : str
+        파장 컬럼 이름
+
+    Returns:
+    --------
+    data : dict
+        {'wavelengths': array, 'R': array, 'G': array, 'B': array,
+         'R_std': array, 'G_std': array, 'B_std': array}
     """
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    colors = ['red', 'green', 'blue']
+    df = pd.read_csv(filename, comment='#')
 
-    for ax, color, label in zip(axes, colors, ['R', 'G', 'B']):
-        sim = simulated_QE[label]
-        meas = measured_QE[label]
+    # 파장을 μm 단위로 변환 (nm → μm)
+    wavelengths = df[wavelength_col].values / 1000.0
 
-        ax.plot(wavelengths, sim, '-', color=color,
-                linewidth=2, label='Simulation')
-        ax.plot(wavelengths, meas, 'o', color=color,
-                markersize=6, label='Measurement')
+    # QE 데이터
+    data = {
+        'wavelengths': wavelengths,
+        'R': df['R_QE'].values if 'R_QE' in df.columns else None,
+        'G': df['G_QE'].values if 'G_QE' in df.columns else None,
+        'B': df['B_QE'].values if 'B_QE' in df.columns else None,
+    }
 
-        # RMSE 계산
-        rmse = np.sqrt(np.mean((np.array(sim) - np.array(meas))**2))
-        ax.text(0.05, 0.95, f'RMSE = {rmse:.4f}',
-                transform=ax.transAxes, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+    # 표준편차 (있는 경우)
+    if 'R_std' in df.columns:
+        data['R_std'] = df['R_std'].values
+        data['G_std'] = df['G_std'].values
+        data['B_std'] = df['B_std'].values
+    else:
+        # 표준편차가 없으면 5% 추정
+        data['R_std'] = data['R'] * 0.05 if data['R'] is not None else None
+        data['G_std'] = data['G'] * 0.05 if data['G'] is not None else None
+        data['B_std'] = data['B'] * 0.05 if data['B'] is not None else None
 
-        ax.set_xlabel('Wavelength (μm)')
-        ax.set_ylabel('QE')
-        ax.set_title(f'{label} Pixel')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
+    return data
 
-    plt.tight_layout()
-    plt.savefig('QE_comparison.png', dpi=150)
+def load_measured_QE_from_excel(filename):
+    """
+    Excel 파일에서 실측 QE 데이터 로딩 (시트별로 R/G/B)
+    """
+    data = {'wavelengths': None}
+
+    for color in ['R', 'G', 'B']:
+        df = pd.read_excel(filename, sheet_name=color)
+        if data['wavelengths'] is None:
+            data['wavelengths'] = df['Wavelength_nm'].values / 1000.0
+        data[color] = df['QE'].values
+        data[f'{color}_std'] = df['QE_std'].values if 'QE_std' in df.columns else data[color] * 0.05
+
+    return data
+
+# 실측 데이터 로드
+measured_data = load_measured_QE_from_csv('sensor_QE_measurement.csv')
+print(f"Loaded {len(measured_data['wavelengths'])} wavelength points")
+print(f"Wavelength range: {measured_data['wavelengths'][0]:.3f} - {measured_data['wavelengths'][-1]:.3f} μm")
+```
+
+#### 2.2 데이터 전처리 및 정렬
+
+실측과 시뮬레이션 데이터의 파장 샘플링이 다를 수 있습니다:
+
+```python
+def align_wavelengths(sim_wavelengths, sim_QE, meas_wavelengths, meas_QE, meas_std=None):
+    """
+    시뮬레이션과 실측 데이터의 파장 정렬
+
+    Parameters:
+    -----------
+    sim_wavelengths : array
+        시뮬레이션 파장 배열
+    sim_QE : array
+        시뮬레이션 QE
+    meas_wavelengths : array
+        실측 파장 배열
+    meas_QE : array
+        실측 QE
+    meas_std : array, optional
+        실측 표준편차
+
+    Returns:
+    --------
+    aligned_data : dict
+        정렬된 데이터 {'wavelengths', 'sim_QE', 'meas_QE', 'meas_std'}
+    """
+    # 공통 파장 범위 찾기
+    wl_min = max(sim_wavelengths[0], meas_wavelengths[0])
+    wl_max = min(sim_wavelengths[-1], meas_wavelengths[-1])
+
+    # 공통 범위에서 새 파장 배열 생성
+    common_wavelengths = np.linspace(wl_min, wl_max, 50)
+
+    # 보간
+    sim_interp = interpolate.interp1d(sim_wavelengths, sim_QE, kind='cubic')
+    meas_interp = interpolate.interp1d(meas_wavelengths, meas_QE, kind='cubic')
+
+    aligned_data = {
+        'wavelengths': common_wavelengths,
+        'sim_QE': sim_interp(common_wavelengths),
+        'meas_QE': meas_interp(common_wavelengths)
+    }
+
+    # 표준편차도 보간
+    if meas_std is not None:
+        std_interp = interpolate.interp1d(meas_wavelengths, meas_std, kind='linear')
+        aligned_data['meas_std'] = std_interp(common_wavelengths)
+
+    return aligned_data
+
+# 사용 예
+aligned_R = align_wavelengths(
+    sim_wavelengths, simulated_QE['R'],
+    measured_data['wavelengths'], measured_data['R'],
+    measured_data['R_std']
+)
+```
+
+#### 2.3 정량적 비교 메트릭
+
+```python
+def calculate_comparison_metrics(sim_QE, meas_QE, meas_std=None):
+    """
+    시뮬레이션과 실측 간 비교 메트릭 계산
+
+    Returns:
+    --------
+    metrics : dict
+        다양한 통계적 메트릭
+    """
+    sim = np.array(sim_QE)
+    meas = np.array(meas_QE)
+    residuals = sim - meas
+
+    metrics = {}
+
+    # 1. Root Mean Square Error (RMSE)
+    metrics['RMSE'] = np.sqrt(np.mean(residuals**2))
+
+    # 2. Normalized RMSE (%)
+    metrics['NRMSE'] = (metrics['RMSE'] / np.mean(meas)) * 100
+
+    # 3. Mean Absolute Error (MAE)
+    metrics['MAE'] = np.mean(np.abs(residuals))
+
+    # 4. Mean Absolute Percentage Error (MAPE)
+    metrics['MAPE'] = np.mean(np.abs(residuals / meas)) * 100
+
+    # 5. R-squared (결정계수)
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((meas - np.mean(meas))**2)
+    metrics['R_squared'] = 1 - (ss_res / ss_tot)
+
+    # 6. Pearson 상관계수
+    metrics['Pearson_r'] = np.corrcoef(sim, meas)[0, 1]
+
+    # 7. Maximum absolute error
+    metrics['Max_error'] = np.max(np.abs(residuals))
+
+    # 8. Chi-squared (표준편차가 있는 경우)
+    if meas_std is not None:
+        chi_squared = np.sum((residuals / meas_std)**2)
+        metrics['Chi_squared'] = chi_squared
+        metrics['Reduced_chi_squared'] = chi_squared / (len(sim) - 1)
+
+    # 9. Bias (평균 편차)
+    metrics['Bias'] = np.mean(residuals)
+
+    return metrics
+
+# 모든 픽셀에 대해 메트릭 계산
+all_metrics = {}
+for color in ['R', 'G', 'B']:
+    aligned = align_wavelengths(
+        sim_wavelengths, simulated_QE[color],
+        measured_data['wavelengths'], measured_data[color],
+        measured_data[f'{color}_std']
+    )
+
+    all_metrics[color] = calculate_comparison_metrics(
+        aligned['sim_QE'],
+        aligned['meas_QE'],
+        aligned.get('meas_std')
+    )
+
+# 메트릭 출력
+print("\n" + "="*60)
+print("Comparison Metrics Summary")
+print("="*60)
+for color in ['R', 'G', 'B']:
+    print(f"\n{color} Pixel:")
+    metrics = all_metrics[color]
+    print(f"  RMSE:          {metrics['RMSE']:.4f}")
+    print(f"  NRMSE:         {metrics['NRMSE']:.2f}%")
+    print(f"  MAE:           {metrics['MAE']:.4f}")
+    print(f"  MAPE:          {metrics['MAPE']:.2f}%")
+    print(f"  R²:            {metrics['R_squared']:.4f}")
+    print(f"  Pearson r:     {metrics['Pearson_r']:.4f}")
+    print(f"  Max error:     {metrics['Max_error']:.4f}")
+    print(f"  Bias:          {metrics['Bias']:.4f}")
+    if 'Reduced_chi_squared' in metrics:
+        print(f"  χ²_reduced:    {metrics['Reduced_chi_squared']:.2f}")
+```
+
+#### 2.4 상세 시각화
+
+```python
+def plot_detailed_comparison(aligned_data, color_name, metrics, save_path=None):
+    """
+    실측-시뮬레이션 상세 비교 플롯
+
+    4-패널 플롯:
+    1. QE 스펙트럼 비교
+    2. 절대 오차
+    3. 상대 오차 (%)
+    4. Residual 분포
+    """
+    fig = plt.figure(figsize=(14, 10))
+    gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.3)
+
+    wavelengths = aligned_data['wavelengths']
+    sim_QE = aligned_data['sim_QE']
+    meas_QE = aligned_data['meas_QE']
+    meas_std = aligned_data.get('meas_std')
+
+    residuals = sim_QE - meas_QE
+
+    # 색상 설정
+    colors_map = {'R': 'red', 'G': 'green', 'B': 'blue'}
+    pcolor = colors_map.get(color_name, 'black')
+
+    # 1. QE 스펙트럼 비교
+    ax1 = fig.add_subplot(gs[0, :])
+    ax1.plot(wavelengths*1000, sim_QE, '-', color=pcolor,
+             linewidth=2.5, label='Simulation', alpha=0.8)
+    ax1.plot(wavelengths*1000, meas_QE, 'o', color=pcolor,
+             markersize=8, label='Measurement', markeredgecolor='black',
+             markeredgewidth=1.5)
+
+    if meas_std is not None:
+        ax1.fill_between(wavelengths*1000,
+                        meas_QE - meas_std,
+                        meas_QE + meas_std,
+                        alpha=0.2, color=pcolor, label='Measurement ±σ')
+
+    ax1.set_xlabel('Wavelength (nm)', fontsize=12, fontweight='bold')
+    ax1.set_ylabel('Quantum Efficiency', fontsize=12, fontweight='bold')
+    ax1.set_title(f'{color_name} Pixel: QE Comparison', fontsize=14, fontweight='bold')
+    ax1.legend(fontsize=11, loc='best')
+    ax1.grid(True, alpha=0.3, linestyle='--')
+    ax1.set_ylim([0, max(np.max(sim_QE), np.max(meas_QE)) * 1.1])
+
+    # 메트릭 텍스트 박스
+    textstr = '\n'.join([
+        f"RMSE = {metrics['RMSE']:.4f}",
+        f"NRMSE = {metrics['NRMSE']:.2f}%",
+        f"R² = {metrics['R_squared']:.4f}",
+        f"MAPE = {metrics['MAPE']:.2f}%"
+    ])
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.7)
+    ax1.text(0.02, 0.98, textstr, transform=ax1.transAxes,
+            fontsize=10, verticalalignment='top', bbox=props)
+
+    # 2. 절대 오차
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax2.plot(wavelengths*1000, residuals, 'o-', color=pcolor,
+            linewidth=2, markersize=6)
+    ax2.axhline(y=0, color='black', linestyle='--', linewidth=1.5, alpha=0.5)
+    ax2.fill_between(wavelengths*1000, 0, residuals, alpha=0.3, color=pcolor)
+    ax2.set_xlabel('Wavelength (nm)', fontsize=11)
+    ax2.set_ylabel('Absolute Error\n(Sim - Meas)', fontsize=11)
+    ax2.set_title('Absolute Residuals', fontsize=12, fontweight='bold')
+    ax2.grid(True, alpha=0.3, linestyle='--')
+
+    # MAE 표시
+    mae_line = np.full_like(wavelengths, metrics['MAE'])
+    ax2.plot(wavelengths*1000, mae_line, 'r--', linewidth=1.5,
+            label=f"MAE = {metrics['MAE']:.4f}")
+    ax2.plot(wavelengths*1000, -mae_line, 'r--', linewidth=1.5)
+    ax2.legend(fontsize=9)
+
+    # 3. 상대 오차 (%)
+    ax3 = fig.add_subplot(gs[1, 1])
+    relative_error = (residuals / meas_QE) * 100
+    ax3.plot(wavelengths*1000, relative_error, 's-', color=pcolor,
+            linewidth=2, markersize=6)
+    ax3.axhline(y=0, color='black', linestyle='--', linewidth=1.5, alpha=0.5)
+    ax3.fill_between(wavelengths*1000, 0, relative_error, alpha=0.3, color=pcolor)
+    ax3.set_xlabel('Wavelength (nm)', fontsize=11)
+    ax3.set_ylabel('Relative Error (%)', fontsize=11)
+    ax3.set_title('Relative Residuals', fontsize=12, fontweight='bold')
+    ax3.grid(True, alpha=0.3, linestyle='--')
+
+    # ±10% 범위 표시
+    ax3.axhline(y=10, color='orange', linestyle=':', linewidth=1.5, alpha=0.7)
+    ax3.axhline(y=-10, color='orange', linestyle=':', linewidth=1.5, alpha=0.7)
+    ax3.text(wavelengths[0]*1000, 10, '  +10%', fontsize=9, color='orange')
+
+    # 4. Residual 히스토그램 및 정규분포 검정
+    ax4 = fig.add_subplot(gs[2, 0])
+    n, bins, patches = ax4.hist(residuals, bins=15, density=True,
+                                alpha=0.7, color=pcolor, edgecolor='black')
+
+    # 정규분포 피팅
+    mu, sigma = residuals.mean(), residuals.std()
+    x = np.linspace(residuals.min(), residuals.max(), 100)
+    ax4.plot(x, (1/(sigma * np.sqrt(2*np.pi))) * np.exp(-0.5*((x-mu)/sigma)**2),
+            'k-', linewidth=2, label=f'Normal\nμ={mu:.4f}\nσ={sigma:.4f}')
+
+    ax4.set_xlabel('Residual Value', fontsize=11)
+    ax4.set_ylabel('Probability Density', fontsize=11)
+    ax4.set_title('Residual Distribution', fontsize=12, fontweight='bold')
+    ax4.legend(fontsize=9)
+    ax4.grid(True, alpha=0.3, axis='y', linestyle='--')
+
+    # 5. Scatter plot (실측 vs 시뮬레이션)
+    ax5 = fig.add_subplot(gs[2, 1])
+    ax5.scatter(meas_QE, sim_QE, s=80, alpha=0.7, color=pcolor,
+               edgecolors='black', linewidth=1.5)
+
+    # 1:1 라인
+    min_val = min(np.min(meas_QE), np.min(sim_QE))
+    max_val = max(np.max(meas_QE), np.max(sim_QE))
+    ax5.plot([min_val, max_val], [min_val, max_val],
+            'k--', linewidth=2, label='1:1 Line')
+
+    # 선형 회귀
+    from scipy.stats import linregress
+    slope, intercept, r_value, p_value, std_err = linregress(meas_QE, sim_QE)
+    line = slope * meas_QE + intercept
+    ax5.plot(meas_QE, line, 'r-', linewidth=2,
+            label=f'Fit: y={slope:.3f}x+{intercept:.3f}')
+
+    ax5.set_xlabel('Measured QE', fontsize=11)
+    ax5.set_ylabel('Simulated QE', fontsize=11)
+    ax5.set_title('Correlation Plot', fontsize=12, fontweight='bold')
+    ax5.legend(fontsize=9)
+    ax5.grid(True, alpha=0.3, linestyle='--')
+    ax5.set_aspect('equal')
+
+    # R² 표시
+    ax5.text(0.05, 0.95, f"R² = {metrics['R_squared']:.4f}",
+            transform=ax5.transAxes, fontsize=10,
+            verticalalignment='top',
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.7))
+
+    if save_path:
+        plt.savefig(save_path, dpi=200, bbox_inches='tight')
+        print(f"Saved detailed comparison plot to {save_path}")
 
     return fig
 
-# 실측 데이터 로드 (예시)
-measured_QE = load_measured_data('sensor_QE_data.csv')
+# 모든 픽셀에 대해 상세 플롯 생성
+for color in ['R', 'G', 'B']:
+    aligned = align_wavelengths(
+        sim_wavelengths, simulated_QE[color],
+        measured_data['wavelengths'], measured_data[color],
+        measured_data.get(f'{color}_std')
+    )
 
-# 비교
-compare_with_measurement(QE_spectrum, measured_QE, wavelengths)
+    fig = plot_detailed_comparison(
+        aligned, color,
+        all_metrics[color],
+        save_path=f'detailed_comparison_{color}_pixel.png'
+    )
+    plt.show()
+```
+
+#### 2.5 통계적 유의성 검정
+
+```python
+from scipy import stats
+
+def statistical_significance_test(sim_QE, meas_QE, meas_std=None):
+    """
+    시뮬레이션과 실측 간 통계적 유의성 검정
+
+    Returns:
+    --------
+    results : dict
+        통계적 검정 결과
+    """
+    results = {}
+
+    # 1. Paired t-test
+    # H0: 시뮬레이션과 실측의 평균이 같다
+    t_stat, p_value = stats.ttest_rel(sim_QE, meas_QE)
+    results['t_test'] = {
+        't_statistic': t_stat,
+        'p_value': p_value,
+        'significant': p_value < 0.05
+    }
+
+    # 2. Wilcoxon signed-rank test (비모수 검정)
+    w_stat, p_value = stats.wilcoxon(sim_QE, meas_QE)
+    results['wilcoxon_test'] = {
+        'w_statistic': w_stat,
+        'p_value': p_value,
+        'significant': p_value < 0.05
+    }
+
+    # 3. Kolmogorov-Smirnov test (분포 비교)
+    ks_stat, p_value = stats.ks_2samp(sim_QE, meas_QE)
+    results['ks_test'] = {
+        'ks_statistic': ks_stat,
+        'p_value': p_value,
+        'significant': p_value < 0.05
+    }
+
+    # 4. Residual 정규성 검정 (Shapiro-Wilk)
+    residuals = sim_QE - meas_QE
+    sw_stat, p_value = stats.shapiro(residuals)
+    results['shapiro_test'] = {
+        'statistic': sw_stat,
+        'p_value': p_value,
+        'is_normal': p_value > 0.05  # p > 0.05이면 정규분포
+    }
+
+    return results
+
+# 통계 검정 수행
+print("\n" + "="*60)
+print("Statistical Significance Tests")
+print("="*60)
+
+for color in ['R', 'G', 'B']:
+    aligned = align_wavelengths(
+        sim_wavelengths, simulated_QE[color],
+        measured_data['wavelengths'], measured_data[color]
+    )
+
+    test_results = statistical_significance_test(
+        aligned['sim_QE'],
+        aligned['meas_QE']
+    )
+
+    print(f"\n{color} Pixel:")
+    print(f"  t-test p-value:     {test_results['t_test']['p_value']:.4f} " +
+          f"{'(significant)' if test_results['t_test']['significant'] else ''}")
+    print(f"  Wilcoxon p-value:   {test_results['wilcoxon_test']['p_value']:.4f}")
+    print(f"  KS test p-value:    {test_results['ks_test']['p_value']:.4f}")
+    print(f"  Residual normality: {test_results['shapiro_test']['p_value']:.4f} " +
+          f"{'(normal)' if test_results['shapiro_test']['is_normal'] else '(non-normal)'}")
 ```
 
 ### 3. 민감도 분석
