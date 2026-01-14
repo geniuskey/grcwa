@@ -193,6 +193,7 @@ nav:
     - Mathematical Formulation: theory/mathematics.md
   - User Guide:
     - Basic Concepts: guide/concepts.md
+    - Image Sensor Simulation: guide/image_sensor_simulation.md
   - Tutorials:
     - Tutorial 1 - Simple Slab: tutorials/tutorial1.md
   - Examples:
