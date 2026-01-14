@@ -9,16 +9,51 @@ import matplotlib.patches as patches
 from matplotlib.patches import FancyArrowPatch, Circle, Rectangle, Polygon
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+import matplotlib.font_manager as fm
 import os
 
 # Set output directory
 output_dir = 'docs_mkdocs/assets/images'
 os.makedirs(output_dir, exist_ok=True)
 
+# Configure Korean font support
+# Directly use system font path for Noto Sans CJK KR
+import glob
+
+font_found = False
+font_paths = [
+    '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+    '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',
+]
+
+for font_path in font_paths:
+    if os.path.exists(font_path):
+        from matplotlib.font_manager import fontManager
+        fontManager.addfont(font_path)
+        plt.rcParams['font.family'] = 'Noto Sans CJK KR'
+        font_found = True
+        print(f"Using Korean font: Noto Sans CJK KR from {font_path}")
+        break
+
+if not font_found:
+    # Try to find any Noto font
+    noto_fonts = glob.glob('/usr/share/fonts/**/Noto*CJK*.ttc', recursive=True)
+    if noto_fonts:
+        from matplotlib.font_manager import fontManager
+        fontManager.addfont(noto_fonts[0])
+        plt.rcParams['font.family'] = 'Noto Sans CJK KR'
+        font_found = True
+        print(f"Using Korean font from: {noto_fonts[0]}")
+
+if not font_found:
+    print("Warning: Korean font not found. Korean text may not display correctly.")
+    plt.rcParams['font.family'] = 'DejaVu Sans'
+
 # Set style
 plt.rcParams['font.size'] = 11
 plt.rcParams['axes.linewidth'] = 1.5
 plt.rcParams['figure.dpi'] = 150
+plt.rcParams['axes.unicode_minus'] = False  # Fix minus sign display
 
 def generate_lattice_structure():
     """Generate real space lattice diagram"""
