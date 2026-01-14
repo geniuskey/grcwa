@@ -512,7 +512,7 @@ GRCWA의 핵심 개념:
 
 ## 다음 단계
 
-- **[레이어 정의](layers.md)**: 상세한 레이어 관리
-- **[여기 설정](excitation.md)**: 편광 및 각도
-- **[결과 계산](results.md)**: R, T 및 장 해석
 - **[튜토리얼](../tutorials/tutorial1.md)**: 실습 예제
+- **[예제 갤러리](../examples/gallery.md)**: 더 많은 예제 둘러보기
+- **[API 레퍼런스](../api/core.md)**: 상세한 함수 문서
+- **[FAQ](../reference/faq.md)**: 자주 묻는 질문

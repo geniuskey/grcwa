@@ -2,7 +2,7 @@
 
 <div align="center" markdown>
 
-![RCWA 구조](../imag/scheme.png){ width="600" loading=lazy }
+![RCWA 구조](imag/scheme.png){ width="600" loading=lazy }
 
 **자동미분 지원 광결정 엄밀 결합파 해석**
 

@@ -15,8 +15,6 @@ Compute transmission and reflection through a photonic crystal slab with circula
 - Hole radius: 0.3 × period
 - Slab thickness: 0.2 μm
 
-**Code:** [ex1.py](ex1.md)
-
 **Results:**
 
 - Total and per-order reflection/transmission
@@ -33,8 +31,6 @@ Multi-layer structure with two different patterned layers.
 - Layer 1: Circular holes (ε=4)
 - Layer 2: Square holes (ε=6)
 - Different patterns in each layer
-
-**Code:** [ex2.py](ex2.md)
 
 **Results:**
 
@@ -368,4 +364,4 @@ plt.show()
 
 - **[Tutorials](../tutorials/tutorial1.md)**: Step-by-step guided examples
 - **[API Reference](../api/core.md)**: Complete function documentation
-- **[Examples Source Code](ex1.md)**: Detailed example implementations
+- **[FAQ](../reference/faq.md)**: Frequently asked questions

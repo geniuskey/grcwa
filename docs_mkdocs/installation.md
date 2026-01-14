@@ -314,7 +314,6 @@ with Pool(8) as p:
 
 문제가 발생하면:
 
-- [문제 해결](reference/troubleshooting.md) 가이드 확인
 - [FAQ](reference/faq.md) 읽기
 - [GitHub](https://github.com/weiliangjinca/grcwa/issues)에 이슈 열기
 - 연락처: jwlaaa@gmail.com

@@ -408,7 +408,6 @@ freq = freq * (1 + 1e-10j)
 
 ## 여전히 질문이 있으신가요?
 
-- [문제 해결 가이드](troubleshooting.md) 확인
 - [튜토리얼](../tutorials/tutorial1.md) 읽기
 - [예제](../examples/gallery.md) 둘러보기
 - [GitHub](https://github.com/weiliangjinca/grcwa/issues)에 이슈 열기
