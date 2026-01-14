@@ -9,51 +9,17 @@ import matplotlib.patches as patches
 from matplotlib.patches import FancyArrowPatch, Circle, Rectangle, Polygon
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import matplotlib.font_manager as fm
 import os
 
 # Set output directory
 output_dir = 'docs_mkdocs/assets/images'
 os.makedirs(output_dir, exist_ok=True)
 
-# Configure Korean font support
-# Directly use system font path for Noto Sans CJK KR
-import glob
-
-font_found = False
-font_paths = [
-    '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
-    '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc',
-]
-
-for font_path in font_paths:
-    if os.path.exists(font_path):
-        from matplotlib.font_manager import fontManager
-        fontManager.addfont(font_path)
-        plt.rcParams['font.family'] = 'Noto Sans CJK KR'
-        font_found = True
-        print(f"Using Korean font: Noto Sans CJK KR from {font_path}")
-        break
-
-if not font_found:
-    # Try to find any Noto font
-    noto_fonts = glob.glob('/usr/share/fonts/**/Noto*CJK*.ttc', recursive=True)
-    if noto_fonts:
-        from matplotlib.font_manager import fontManager
-        fontManager.addfont(noto_fonts[0])
-        plt.rcParams['font.family'] = 'Noto Sans CJK KR'
-        font_found = True
-        print(f"Using Korean font from: {noto_fonts[0]}")
-
-if not font_found:
-    print("Warning: Korean font not found. Korean text may not display correctly.")
-    plt.rcParams['font.family'] = 'DejaVu Sans'
-
 # Set style
 plt.rcParams['font.size'] = 11
 plt.rcParams['axes.linewidth'] = 1.5
 plt.rcParams['figure.dpi'] = 150
-plt.rcParams['axes.unicode_minus'] = False  # Fix minus sign display
+plt.rcParams['axes.unicode_minus'] = False
 
 def generate_lattice_structure():
     """Generate real space lattice diagram"""
@@ -71,7 +37,7 @@ def generate_lattice_structure():
                 ax.plot(point[0], point[1], 'ko', markersize=8)
 
     # Origin point (highlighted)
-    ax.plot(0, 0, 'ro', markersize=12, label='원점', zorder=5)
+    ax.plot(0, 0, 'ro', markersize=12, label='Origin', zorder=5)
 
     # Draw lattice vectors from origin
     ax.arrow(0, 0, L1[0], L1[1], head_width=0.15, head_length=0.15,
@@ -81,7 +47,7 @@ def generate_lattice_structure():
 
     # Draw unit cell
     vertices = np.array([[0, 0], L1, L1 + L2, L2, [0, 0]])
-    ax.plot(vertices[:, 0], vertices[:, 1], 'r--', linewidth=2, alpha=0.7, label='단위 셀')
+    ax.plot(vertices[:, 0], vertices[:, 1], 'r--', linewidth=2, alpha=0.7, label='Unit Cell')
     ax.fill(vertices[:-1, 0], vertices[:-1, 1], alpha=0.1, color='red')
 
     # Add text annotations
@@ -90,7 +56,7 @@ def generate_lattice_structure():
 
     ax.set_xlabel('$x$', fontsize=14)
     ax.set_ylabel('$y$', fontsize=14)
-    ax.set_title('실공간 격자 구조 (Real Space Lattice)', fontsize=15, fontweight='bold')
+    ax.set_title('Real Space Lattice', fontsize=15, fontweight='bold')
     ax.grid(True, alpha=0.3)
     ax.set_aspect('equal')
     ax.legend(loc='upper right', fontsize=11)
@@ -123,7 +89,7 @@ def generate_reciprocal_lattice():
                            fontsize=9, color='darkblue')
 
     # Origin (0,0 order - highlighted)
-    ax.plot(0, 0, 'ro', markersize=12, label='(0,0) 차수', zorder=5)
+    ax.plot(0, 0, 'ro', markersize=12, label='(0,0) order', zorder=5)
 
     # Draw reciprocal lattice vectors
     ax.arrow(0, 0, G1[0], G1[1], head_width=0.15, head_length=0.15,
@@ -133,7 +99,7 @@ def generate_reciprocal_lattice():
 
     # Draw truncation circle (nG example)
     circle = plt.Circle((0, 0), 2.5, color='red', fill=False, linewidth=2,
-                        linestyle='--', label='절단 영역 (nG)', alpha=0.7)
+                        linestyle='--', label='Truncation (nG)', alpha=0.7)
     ax.add_patch(circle)
 
     ax.text(G1[0]/2 + 0.2, G1[1]/2 - 0.3, '$\\mathbf{G}_1$', fontsize=14,
@@ -143,7 +109,7 @@ def generate_reciprocal_lattice():
 
     ax.set_xlabel('$k_x$', fontsize=14)
     ax.set_ylabel('$k_y$', fontsize=14)
-    ax.set_title('역격자 공간 및 회절 차수 (Reciprocal Lattice)', fontsize=15, fontweight='bold')
+    ax.set_title('Reciprocal Lattice & Diffraction Orders', fontsize=15, fontweight='bold')
     ax.grid(True, alpha=0.3)
     ax.set_aspect('equal')
     ax.legend(loc='upper right', fontsize=10)
@@ -162,11 +128,11 @@ def generate_layer_stack():
 
     # Layer definitions: (y_start, thickness, color, label, epsilon)
     layers = [
-        (5.0, 1.5, '#87CEEB', '입사 매질 (Air)\n$\\varepsilon = 1.0$', 1.0),
+        (5.0, 1.5, '#87CEEB', 'Incident Medium (Air)\n$\\varepsilon = 1.0$', 1.0),
         (3.5, 0.8, '#FFD700', 'Layer 1\n$\\varepsilon(x,y)$', None),
         (2.7, 0.5, '#90EE90', 'Layer 2 (Uniform)\n$\\varepsilon = 2.25$', 2.25),
         (2.2, 1.0, '#FFA07A', 'Layer 3\n$\\varepsilon(x,y)$', None),
-        (1.2, 1.2, '#87CEEB', '투과 매질 (Substrate)\n$\\varepsilon = 2.1$', 2.1),
+        (1.2, 1.2, '#87CEEB', 'Transmission Medium\n$\\varepsilon = 2.1$', 2.1),
     ]
 
     width = 6
@@ -200,7 +166,7 @@ def generate_layer_stack():
     arrow_y = 6.8
     ax.annotate('', xy=(arrow_x, 5.2), xytext=(arrow_x, arrow_y),
                 arrowprops=dict(arrowstyle='->', lw=3, color='red'))
-    ax.text(arrow_x - 0.5, 6.0, '입사파\n$\\theta, \\phi$', fontsize=11,
+    ax.text(arrow_x - 0.5, 6.0, 'Incident\n$\\theta, \\phi$', fontsize=11,
             color='red', fontweight='bold')
 
     # Draw reflected wave
@@ -225,7 +191,7 @@ def generate_layer_stack():
     ax.set_ylim(-0.5, 7.5)
     ax.set_aspect('equal')
     ax.axis('off')
-    ax.set_title('다층 구조 (Layer Stack)', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Multi-Layer Structure', fontsize=16, fontweight='bold', pad=20)
 
     plt.tight_layout()
     plt.savefig(f'{output_dir}/layer_stack.png', dpi=150, bbox_inches='tight')
@@ -264,7 +230,7 @@ def generate_bayer_pattern():
                           facecolor='none', edgecolor='yellow',
                           linewidth=4, linestyle='--')
     ax.add_patch(rect_unit)
-    ax.text(1, 4.3, '2×2 단위 셀', ha='center', fontsize=13,
+    ax.text(1, 4.3, '2×2 Unit Cell', ha='center', fontsize=13,
            fontweight='bold', color='yellow',
            bbox=dict(boxstyle='round', facecolor='black', alpha=0.7))
 
@@ -272,7 +238,7 @@ def generate_bayer_pattern():
     ax.set_ylim(-0.2, n + 0.5)
     ax.set_aspect('equal')
     ax.axis('off')
-    ax.set_title('Bayer 패턴 배열 (2×2 단위 셀)', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Bayer Pattern Array (2×2 Unit Cell)', fontsize=16, fontweight='bold', pad=20)
 
     # Add legend
     legend_elements = [
@@ -297,11 +263,11 @@ def generate_sensor_structure():
     width = 8
 
     layers_data = [
-        (0, 1.5, '#FF6B6B', '실리콘 기판 (Si substrate)'),
-        (1.5, 2.0, '#4A90E2', '광다이오드 영역 (Photodiode)\n전하 수집'),
-        (3.5, 0.3, '#999999', '금속 배선 (Metal wiring)'),
-        (3.8, 0.5, '#95E1D3', '컬러 필터 (Color filter)'),
-        (4.3, 0.8, '#87CEEB', '마이크로렌즈 (Microlens)'),
+        (0, 1.5, '#FF6B6B', 'Si substrate'),
+        (1.5, 2.0, '#4A90E2', 'Photodiode\n(charge collection)'),
+        (3.5, 0.3, '#999999', 'Metal wiring'),
+        (3.8, 0.5, '#95E1D3', 'Color filter'),
+        (4.3, 0.8, '#87CEEB', 'Microlens'),
     ]
 
     for y_bottom, height, color, label in layers_data:
@@ -334,7 +300,7 @@ def generate_sensor_structure():
         ax.plot([x_start + x_offset, target_x], [5.1, 2.5],
                'orange', linewidth=2, linestyle='--', alpha=0.7)
 
-    ax.text(x_start + width/2, 7.0, '입사광', ha='center', fontsize=13,
+    ax.text(x_start + width/2, 7.0, 'Incident Light', ha='center', fontsize=13,
            fontweight='bold', color='red')
 
     # Add dimension arrows
@@ -349,14 +315,14 @@ def generate_sensor_structure():
     # Add pixel pitch annotation
     ax.annotate('', xy=(x_start, -0.5), xytext=(x_start + width, -0.5),
                arrowprops=dict(arrowstyle='<->', lw=2))
-    ax.text(x_start + width/2, -0.9, '픽셀 피치 (Pixel pitch) ~1-2μm',
+    ax.text(x_start + width/2, -0.9, 'Pixel pitch ~1-2μm',
            fontsize=11, ha='center', fontweight='bold')
 
     ax.set_xlim(0, 11)
     ax.set_ylim(-1.5, 7.5)
     ax.set_aspect('equal')
     ax.axis('off')
-    ax.set_title('이미지 센서 픽셀 구조 (단면도)', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Image Sensor Pixel Structure (Cross-section)', fontsize=16, fontweight='bold', pad=20)
 
     plt.tight_layout()
     plt.savefig(f'{output_dir}/sensor_structure.png', dpi=150, bbox_inches='tight')
@@ -396,13 +362,13 @@ def generate_incidence_geometry():
 
     # Draw incident wave vector
     ax.quiver(0, 0, 1.5, kx, ky, kz, color='red', arrow_length_ratio=0.15,
-             linewidth=3, label='입사 파동벡터 $\\mathbf{k}$')
+             linewidth=3, label='Incident $\\mathbf{k}$')
 
     # Draw projection on xy-plane
     ax.plot([0, kx], [0, ky], [0, 0], 'r--', linewidth=2, alpha=0.5)
     ax.plot([kx, kx], [ky, ky], [0, 1.5+kz], 'r--', linewidth=1, alpha=0.5)
 
-    # Draw theta angle arc (in xz-plane for visualization)
+    # Draw theta angle arc
     theta_arc = np.linspace(np.pi/2, np.pi/2 + theta, 20)
     arc_r = 0.4
     arc_x = arc_r * np.sin(theta_arc) * np.cos(phi)
@@ -422,7 +388,7 @@ def generate_incidence_geometry():
     ax.text(arc_x2[10] + 0.1, arc_y2[10], 0.1, '$\\phi$', fontsize=14,
            color='green', fontweight='bold')
 
-    # Draw polarization vectors (perpendicular to k)
+    # Draw polarization vectors
     # s-polarization (perpendicular to plane of incidence)
     s_pol = np.array([-np.sin(phi), np.cos(phi), 0])
     s_pol = s_pol / np.linalg.norm(s_pol) * 0.6
@@ -430,7 +396,7 @@ def generate_incidence_geometry():
     ax.quiver(origin_pol[0], origin_pol[1], origin_pol[2],
              s_pol[0], s_pol[1], s_pol[2],
              color='purple', arrow_length_ratio=0.2, linewidth=2.5,
-             label='s-편광 (TE)')
+             label='s-pol (TE)')
 
     # p-polarization (in plane of incidence)
     p_pol = np.cross([kx, ky, kz], s_pol)
@@ -438,12 +404,12 @@ def generate_incidence_geometry():
     ax.quiver(origin_pol[0], origin_pol[1], origin_pol[2],
              p_pol[0], p_pol[1], p_pol[2],
              color='orange', arrow_length_ratio=0.2, linewidth=2.5,
-             label='p-편광 (TM)')
+             label='p-pol (TM)')
 
     ax.set_xlabel('X', fontsize=12)
     ax.set_ylabel('Y', fontsize=12)
     ax.set_zlabel('Z', fontsize=12)
-    ax.set_title('입사각 및 편광 기하학', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Incidence Geometry & Polarization', fontsize=16, fontweight='bold', pad=20)
 
     ax.set_xlim([-1, 1.5])
     ax.set_ylim([-1, 1.5])
@@ -485,7 +451,7 @@ def generate_diffraction_orders():
             beam_length * np.sin(incident_angle),
             -beam_length * np.cos(incident_angle),
             head_width=0.15, head_length=0.1, fc='red', ec='red', linewidth=2.5)
-    ax.text(beam_x - 1.2, 1.5, '입사광\n$\\theta_i$', fontsize=12, color='red', fontweight='bold')
+    ax.text(beam_x - 1.2, 1.5, 'Incident\n$\\theta_i$', fontsize=12, color='red', fontweight='bold')
 
     # Diffraction orders
     orders = [-2, -1, 0, 1, 2]
@@ -519,10 +485,10 @@ def generate_diffraction_orders():
     ax.set_ylim(-1, 3)
     ax.set_aspect('equal')
     ax.axis('off')
-    ax.set_title('회절 차수 (Diffraction Orders)', fontsize=16, fontweight='bold', pad=20)
+    ax.set_title('Diffraction Orders', fontsize=16, fontweight='bold', pad=20)
 
-    # Add legend for propagating orders
-    ax.text(2.5, 2.5, '전파 차수\n(Propagating)', fontsize=11,
+    # Add legend
+    ax.text(2.5, 2.5, 'Propagating\nOrders', fontsize=11,
            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
 
     plt.tight_layout()
