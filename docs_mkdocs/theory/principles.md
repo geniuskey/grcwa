@@ -1,12 +1,12 @@
-# Physical Principles of RCWA
+# RCWA의 물리적 원리
 
-This page explains the physics behind Rigorous Coupled Wave Analysis (RCWA).
+이 페이지는 엄밀 결합파 해석(RCWA)의 배후 물리학을 설명합니다.
 
-## Maxwell's Equations
+## Maxwell 방정식
 
-RCWA solves Maxwell's equations for time-harmonic fields with convention $e^{-i\omega t}$:
+RCWA는 시간 조화 장에 대한 Maxwell 방정식을 $e^{-i\omega t}$ 규약으로 풉니다:
 
-### Curl Equations
+### 회전 방정식
 
 $$
 \nabla \times \mathbf{E} = i\omega \mathbf{B} = i\omega \mu \mathbf{H}
@@ -16,7 +16,7 @@ $$
 \nabla \times \mathbf{H} = -i\omega \mathbf{D} = -i\omega \varepsilon \mathbf{E}
 $$
 
-### Divergence Equations
+### 발산 방정식
 
 $$
 \nabla \cdot \mathbf{D} = \nabla \cdot (\varepsilon \mathbf{E}) = 0
@@ -26,11 +26,11 @@ $$
 \nabla \cdot \mathbf{B} = \nabla \cdot (\mu \mathbf{H}) = 0
 $$
 
-In GRCWA's natural units: $\varepsilon_0 = \mu_0 = c = 1$
+GRCWA의 자연 단위계: $\varepsilon_0 = \mu_0 = c = 1$
 
-## Wave Equation
+## 파동 방정식
 
-From Maxwell's curl equations, we can derive the vector wave equation:
+Maxwell 회전 방정식으로부터 벡터 파동 방정식을 유도할 수 있습니다:
 
 $$
 \nabla \times \nabla \times \mathbf{E} - \omega^2 \varepsilon \mathbf{E} = 0
@@ -40,42 +40,42 @@ $$
 \nabla \times \nabla \times \mathbf{H} - \omega^2 \mu \mathbf{H} = 0
 $$
 
-Using the identity $\nabla \times \nabla \times \mathbf{F} = \nabla(\nabla \cdot \mathbf{F}) - \nabla^2 \mathbf{F}$:
+항등식 $\nabla \times \nabla \times \mathbf{F} = \nabla(\nabla \cdot \mathbf{F}) - \nabla^2 \mathbf{F}$를 사용하면:
 
-For **E-field** in uniform media:
+균일 매질에서 **E-장**의 경우:
 $$
 \nabla^2 \mathbf{E} + \omega^2 \varepsilon \mathbf{E} = 0
 $$
 
-This is the Helmholtz equation with wave number $k = \omega\sqrt{\varepsilon}$.
+이는 파수 $k = \omega\sqrt{\varepsilon}$를 갖는 Helmholtz 방정식입니다.
 
-## Periodic Structures
+## 주기 구조
 
-### Lattice Periodicity
+### 격자 주기성
 
-A photonic crystal has 2D periodicity:
+광결정은 2D 주기성을 가집니다:
 
 $$
 \varepsilon(\mathbf{r} + m\mathbf{L}_1 + n\mathbf{L}_2) = \varepsilon(\mathbf{r})
 $$
 
-where $m, n \in \mathbb{Z}$ and $\mathbf{L}_1, \mathbf{L}_2$ are lattice vectors.
+여기서 $m, n \in \mathbb{Z}$이고 $\mathbf{L}_1, \mathbf{L}_2$는 격자 벡터입니다.
 
-**Example lattices:**
+**격자 예시:**
 
-- **Square**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = a\hat{y}$
-- **Rectangular**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = b\hat{y}$
-- **Hexagonal**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = a(\frac{1}{2}\hat{x} + \frac{\sqrt{3}}{2}\hat{y})$
+- **정사각**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = a\hat{y}$
+- **직사각**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = b\hat{y}$
+- **육각**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = a(\frac{1}{2}\hat{x} + \frac{\sqrt{3}}{2}\hat{y})$
 
-### Reciprocal Lattice
+### 역격자
 
-The reciprocal lattice vectors satisfy:
+역격자 벡터는 다음을 만족합니다:
 
 $$
 \mathbf{K}_i \cdot \mathbf{L}_j = 2\pi \delta_{ij}
 $$
 
-For 2D lattices embedded in 3D:
+3D에 내장된 2D 격자의 경우:
 
 $$
 \mathbf{K}_1 = 2\pi \frac{\mathbf{L}_2 \times \hat{z}}{|\mathbf{L}_1 \times \mathbf{L}_2 \cdot \hat{z}|}
@@ -85,30 +85,30 @@ $$
 \mathbf{K}_2 = 2\pi \frac{\hat{z} \times \mathbf{L}_1}{|\mathbf{L}_1 \times \mathbf{L}_2 \cdot \hat{z}|}
 $$
 
-The reciprocal lattice vectors are:
+역격자 벡터는:
 
 $$
 \mathbf{G}_{mn} = m\mathbf{K}_1 + n\mathbf{K}_2, \quad m,n \in \mathbb{Z}
 $$
 
-## Bloch's Theorem
+## Bloch 정리
 
-### Bloch Waves
+### Bloch 파
 
-In periodic structures, electromagnetic modes are **Bloch waves**:
+주기 구조에서 전자기 모드는 **Bloch 파**입니다:
 
 $$
 \mathbf{E}(\mathbf{r}) = e^{i\mathbf{k}_\parallel \cdot \mathbf{r}_\parallel} \mathbf{u}(\mathbf{r})
 $$
 
-where:
+여기서:
 
-- $\mathbf{k}_\parallel = k_x\hat{x} + k_y\hat{y}$ is the Bloch wave vector
-- $\mathbf{u}(\mathbf{r})$ has the same periodicity as the structure: $\mathbf{u}(\mathbf{r} + \mathbf{L}) = \mathbf{u}(\mathbf{r})$
+- $\mathbf{k}_\parallel = k_x\hat{x} + k_y\hat{y}$는 Bloch 파동 벡터
+- $\mathbf{u}(\mathbf{r})$는 구조와 동일한 주기성을 가집니다: $\mathbf{u}(\mathbf{r} + \mathbf{L}) = \mathbf{u}(\mathbf{r})$
 
-### Floquet-Bloch Theorem
+### Floquet-Bloch 정리
 
-Since $\mathbf{u}(\mathbf{r})$ is periodic, it can be expanded in a Fourier series:
+$\mathbf{u}(\mathbf{r})$가 주기적이므로 Fourier 급수로 전개할 수 있습니다:
 
 $$
 \mathbf{E}(\mathbf{r}) = e^{i\mathbf{k}_\parallel \cdot \mathbf{r}_\parallel} \sum_{mn} \mathbf{E}_{mn}(z) e^{i\mathbf{G}_{mn} \cdot \mathbf{r}_\parallel}
@@ -118,19 +118,19 @@ $$
 = \sum_{mn} \mathbf{E}_{mn}(z) e^{i(\mathbf{k}_\parallel + \mathbf{G}_{mn}) \cdot \mathbf{r}_\parallel}
 $$
 
-Define **Bloch wave vectors**:
+**Bloch 파동 벡터** 정의:
 
 $$
 \mathbf{k}_{mn,\parallel} = \mathbf{k}_\parallel + \mathbf{G}_{mn}
 $$
 
-Each $(m,n)$ is a **diffraction order** or **Floquet harmonic**.
+각 $(m,n)$은 **회절 차수** 또는 **Floquet 조화함수**입니다.
 
-## Diffraction and Propagation
+## 회절과 전파
 
-### In-Plane Wave Vectors
+### 면내 파동 벡터
 
-For incident plane wave with angles $(\theta, \phi)$ in a medium with $\varepsilon_{\text{in}}$:
+$\varepsilon_{\text{in}}$을 갖는 매질에서 각도 $(\theta, \phi)$로 입사하는 평면파의 경우:
 
 $$
 k_{x0} = \omega\sqrt{\varepsilon_{\text{in}}} \sin\theta \cos\phi
@@ -140,7 +140,7 @@ $$
 k_{y0} = \omega\sqrt{\varepsilon_{\text{in}}} \sin\theta \sin\phi
 $$
 
-Each diffraction order has in-plane wave vector:
+각 회절 차수는 면내 파동 벡터를 가집니다:
 
 $$
 k_{x,mn} = k_{x0} + G_{x,mn}
@@ -150,114 +150,114 @@ $$
 k_{y,mn} = k_{y0} + G_{y,mn}
 $$
 
-### Z-Component of Wave Vector
+### 파동 벡터의 Z-성분
 
-From the dispersion relation in a medium with $\varepsilon$:
+$\varepsilon$을 갖는 매질에서 분산 관계로부터:
 
 $$
 k_{x,mn}^2 + k_{y,mn}^2 + k_{z,mn}^2 = \varepsilon \omega^2
 $$
 
-Therefore:
+따라서:
 
 $$
 k_{z,mn} = \pm\sqrt{\varepsilon \omega^2 - k_{x,mn}^2 - k_{y,mn}^2}
 $$
 
-**Two cases:**
+**두 가지 경우:**
 
-1. **Propagating modes**: $k_{x,mn}^2 + k_{y,mn}^2 < \varepsilon\omega^2$ → $k_z$ is real
-   - Carries power to far field
-   - Contributes to reflection/transmission
+1. **전파 모드**: $k_{x,mn}^2 + k_{y,mn}^2 < \varepsilon\omega^2$ → $k_z$는 실수
+   - 원거리장으로 파워를 운반
+   - 반사/투과에 기여
 
-2. **Evanescent modes**: $k_{x,mn}^2 + k_{y,mn}^2 > \varepsilon\omega^2$ → $k_z$ is imaginary
-   - Decays exponentially: $e^{-|\text{Im}(k_z)|z}$
-   - Stores near-field energy
-   - Important for field distributions but doesn't contribute to R/T
+2. **소산 모드**: $k_{x,mn}^2 + k_{y,mn}^2 > \varepsilon\omega^2$ → $k_z$는 허수
+   - 지수적으로 감쇠: $e^{-|\text{Im}(k_z)|z}$
+   - 근접장 에너지를 저장
+   - 장 분포에는 중요하지만 R/T에는 기여하지 않음
 
-### Physical Interpretation
+### 물리적 해석
 
-Think of diffraction orders as different "beams" produced by the periodic structure:
+회절 차수를 주기 구조에 의해 생성되는 서로 다른 "빔"으로 생각하세요:
 
-- **0th order** $(m=0, n=0)$: Main transmitted/reflected beam
-- **Higher orders** $(m,n \neq 0)$: Diffracted beams at angles determined by $\mathbf{k}_{mn}$
+- **0차** $(m=0, n=0)$: 주 투과/반사 빔
+- **고차** $(m,n \neq 0)$: $\mathbf{k}_{mn}$에 의해 결정되는 각도로 회절된 빔
 
-At low frequencies (long wavelengths), most orders are evanescent. At high frequencies, many orders can propagate.
+낮은 주파수(긴 파장)에서는 대부분의 차수가 소산됩니다. 높은 주파수에서는 많은 차수가 전파할 수 있습니다.
 
-## Polarization
+## 편광
 
-### S and P Polarization
+### S 및 P 편광
 
-For plane waves, we decompose into two orthogonal polarizations:
+평면파의 경우 두 개의 직교 편광으로 분해합니다:
 
-**S-polarization (TE)**: Electric field perpendicular to plane of incidence
+**S-편광 (TE)**: 입사면에 수직인 전기장
 
-- For normal incidence with $\mathbf{k} \parallel \hat{z}$: $\mathbf{E} \parallel \hat{x}$ or $\hat{y}$
+- $\mathbf{k} \parallel \hat{z}$인 수직 입사의 경우: $\mathbf{E} \parallel \hat{x}$ 또는 $\hat{y}$
 
-**P-polarization (TM)**: Magnetic field perpendicular to plane of incidence
+**P-편광 (TM)**: 입사면에 수직인 자기장
 
-- Electric field in the plane of incidence
+- 입사면 내의 전기장
 
-### General Polarization State
+### 일반 편광 상태
 
-An arbitrary polarization is a superposition:
+임의의 편광은 중첩입니다:
 
 $$
 \mathbf{E} = A_s e^{i\phi_s} \hat{s} + A_p e^{i\phi_p} \hat{p}
 $$
 
-**Linear polarization**: $\phi_p - \phi_s = 0$ or $\pi$
+**선형 편광**: $\phi_p - \phi_s = 0$ 또는 $\pi$
 
-**Circular polarization**: $A_p = A_s$, $\phi_p - \phi_s = \pm\pi/2$
+**원형 편광**: $A_p = A_s$, $\phi_p - \phi_s = \pm\pi/2$
 
-**Elliptical polarization**: General case
+**타원 편광**: 일반적인 경우
 
-## Energy and Power Flow
+## 에너지 및 파워 흐름
 
-### Poynting Vector
+### Poynting 벡터
 
-The time-averaged Poynting vector is:
+시간 평균 Poynting 벡터는:
 
 $$
 \langle\mathbf{S}\rangle = \frac{1}{2} \text{Re}(\mathbf{E} \times \mathbf{H}^*)
 $$
 
-This gives the electromagnetic power flow (energy per area per time).
+이는 전자기 파워 흐름(단위 면적 단위 시간당 에너지)을 제공합니다.
 
-### Power in Each Order
+### 각 차수의 파워
 
-For each diffraction order $(m,n)$:
+각 회절 차수 $(m,n)$에 대해:
 
 $$
 P_{mn} = \frac{1}{2} \text{Re}\left( E_{x,mn} H_{y,mn}^* - E_{y,mn} H_{x,mn}^* \right) \cdot \frac{A_{\text{cell}}}{\cos\theta_{mn}}
 $$
 
-where:
+여기서:
 
-- $A_{\text{cell}} = |\mathbf{L}_1 \times \mathbf{L}_2|$ is the unit cell area
-- $\theta_{mn}$ is the propagation angle of order $(m,n)$
+- $A_{\text{cell}} = |\mathbf{L}_1 \times \mathbf{L}_2|$는 단위 셀 면적
+- $\theta_{mn}$은 차수 $(m,n)$의 전파 각도
 
-### Reflection and Transmission
+### 반사 및 투과
 
-**Total reflected power**:
+**전체 반사 파워**:
 
 $$
 R = \sum_{mn} \frac{P_{mn}^{\text{refl}}}{P_{\text{inc}}}
 $$
 
-**Total transmitted power**:
+**전체 투과 파워**:
 
 $$
 T = \sum_{mn} \frac{P_{mn}^{\text{trans}}}{P_{\text{inc}}}
 $$
 
-For lossless structures: $R + T = 1$ (energy conservation)
+손실 없는 구조의 경우: $R + T = 1$ (에너지 보존)
 
-## Boundary Conditions
+## 경계 조건
 
-### Tangential Field Continuity
+### 접선 장 연속성
 
-At interfaces between layers, tangential components must be continuous:
+레이어 간 경계면에서 접선 성분은 연속이어야 합니다:
 
 $$
 \mathbf{n} \times (\mathbf{E}_1 - \mathbf{E}_2) = 0
@@ -267,17 +267,17 @@ $$
 \mathbf{n} \times (\mathbf{H}_1 - \mathbf{H}_2) = 0
 $$
 
-where $\mathbf{n}$ is the interface normal.
+여기서 $\mathbf{n}$은 경계면 법선입니다.
 
-For horizontal interfaces ($\mathbf{n} = \hat{z}$):
+수평 경계면 ($\mathbf{n} = \hat{z}$)의 경우:
 
 $$
-E_x, E_y, H_x, H_y \text{ continuous}
+E_x, E_y, H_x, H_y \text{ 연속}
 $$
 
-### Normal Field Discontinuity
+### 법선 장 불연속성
 
-Normal components satisfy:
+법선 성분은 다음을 만족합니다:
 
 $$
 \mathbf{n} \cdot (\varepsilon_1 \mathbf{E}_1 - \varepsilon_2 \mathbf{E}_2) = 0
@@ -287,104 +287,104 @@ $$
 \mathbf{n} \cdot (\mu_1 \mathbf{H}_1 - \mu_2 \mathbf{H}_2) = 0
 $$
 
-For dielectric contrast, $D_z = \varepsilon E_z$ is continuous, but $E_z$ is not.
+유전체 대비의 경우 $D_z = \varepsilon E_z$는 연속이지만 $E_z$는 그렇지 않습니다.
 
-## Layer Structure in RCWA
+## RCWA의 레이어 구조
 
-### Uniform Layers
+### 균일 레이어
 
-For layers with constant $\varepsilon(z) = \varepsilon_0$:
+상수 $\varepsilon(z) = \varepsilon_0$를 갖는 레이어의 경우:
 
-- Analytical eigenmode solution
-- Modes are forward/backward propagating plane waves
-- Fast and stable
+- 해석적 고유모드 해
+- 모드는 전방/후방 전파 평면파
+- 빠르고 안정적
 
-### Patterned Layers
+### 패턴 레이어
 
-For layers with $\varepsilon(x,y,z) = \varepsilon(x,y)$ (z-invariant):
+$\varepsilon(x,y,z) = \varepsilon(x,y)$ (z-불변)를 갖는 레이어의 경우:
 
-- Must solve eigenvalue problem numerically
-- Modes are Bloch waves with different $k_z$
-- More computationally expensive
+- 고유값 문제를 수치적으로 풀어야 함
+- 모드는 서로 다른 $k_z$를 갖는 Bloch 파
+- 계산 비용이 더 높음
 
-### Layer Stacking
+### 레이어 적층
 
-RCWA treats the structure as a stack:
+RCWA는 구조를 스택으로 취급합니다:
 
 ```
-Input region (uniform)
+입력 영역 (균일)
 ↓
-Layer 1 (uniform or patterned)
+레이어 1 (균일 또는 패턴)
 ↓
-Layer 2 (uniform or patterned)
+레이어 2 (균일 또는 패턴)
 ↓
 ...
 ↓
-Layer N (uniform or patterned)
+레이어 N (균일 또는 패턴)
 ↓
-Output region (uniform)
+출력 영역 (균일)
 ```
 
-Each layer is solved independently, then coupled via boundary conditions.
+각 레이어는 독립적으로 풀린 다음 경계 조건을 통해 결합됩니다.
 
-## Truncation and Convergence
+## 절단 및 수렴
 
-### Fourier Truncation
+### Fourier 절단
 
-In practice, we truncate the infinite Fourier series:
+실제로는 무한 Fourier 급수를 절단합니다:
 
 $$
 \mathbf{E}(\mathbf{r}) = \sum_{m=-M}^{M} \sum_{n=-N}^{N} \mathbf{E}_{mn}(z) e^{i\mathbf{k}_{mn} \cdot \mathbf{r}_\parallel}
 $$
 
-The truncation order $N_G = (2M+1)(2N+1)$ determines accuracy and computational cost.
+절단 차수 $N_G = (2M+1)(2N+1)$은 정확도와 계산 비용을 결정합니다.
 
-### Convergence Behavior
+### 수렴 거동
 
-**Smooth features**: Fast convergence, small $N_G$ sufficient
+**매끄러운 특징**: 빠른 수렴, 작은 $N_G$로 충분
 
-**Sharp features**: Slow convergence, large $N_G$ needed (Gibbs phenomenon)
+**날카로운 특징**: 느린 수렴, 큰 $N_G$ 필요 (Gibbs 현상)
 
-**Deep subwavelength**: Very large $N_G$ may be required
+**깊은 아파장**: 매우 큰 $N_G$가 필요할 수 있음
 
-**Rule of thumb**: Start with $N_G \sim 101$, increase until results converge
+**경험 법칙**: $N_G \sim 101$로 시작하여 결과가 수렴할 때까지 증가
 
-## Physical Insights
+## 물리적 통찰
 
-### Why RCWA Works
+### RCWA가 작동하는 이유
 
-1. **Periodicity reduces dimensionality**: 3D problem → unit cell + Bloch theorem
-2. **Fourier representation**: Efficient for smooth dielectric profiles
-3. **Layer-wise**: Complex 3D structure → stack of 2D problems
-4. **Rigorous**: Solves Maxwell's equations exactly (within truncation)
+1. **주기성이 차원을 감소**: 3D 문제 → 단위 셀 + Bloch 정리
+2. **Fourier 표현**: 매끄러운 유전 프로파일에 효율적
+3. **레이어별**: 복잡한 3D 구조 → 2D 문제의 스택
+4. **엄밀함**: Maxwell 방정식을 정확하게 풉니다 (절단 내에서)
 
-### When RCWA Excels
+### RCWA가 뛰어난 경우
 
-- **High-Q resonances**: Captures sharp spectral features
-- **Subwavelength structures**: Handles near-field correctly
-- **Multiple diffraction orders**: Analyzes each order separately
-- **Arbitrary patterns**: No restriction on shape (with grid method)
+- **고Q 공진**: 날카로운 스펙트럼 특징 포착
+- **아파장 구조**: 근접장을 올바르게 처리
+- **다중 회절 차수**: 각 차수를 개별적으로 분석
+- **임의 패턴**: 형상에 제한 없음 (그리드 방법 사용)
 
-### Limitations
+### 한계
 
-- **Requires periodicity**: Can't simulate isolated objects directly (use super-cell)
-- **Convergence for sharp edges**: May need high truncation order
-- **Frequency domain**: Time-domain requires Fourier transform
+- **주기성 필요**: 고립된 물체를 직접 시뮬레이션할 수 없음 (슈퍼셀 사용)
+- **날카로운 가장자리의 수렴**: 높은 절단 차수가 필요할 수 있음
+- **주파수 영역**: 시간 영역은 Fourier 변환 필요
 
-## Summary
+## 요약
 
-RCWA solves Maxwell's equations for periodic structures by:
+RCWA는 주기 구조에 대한 Maxwell 방정식을 다음과 같이 풉니다:
 
-1. Expanding fields in Floquet-Bloch modes (diffraction orders)
-2. Fourier transforming the dielectric profile
-3. Solving eigenvalue problems for each layer
-4. Matching boundary conditions between layers
-5. Computing power flow in each diffraction order
+1. Floquet-Bloch 모드(회절 차수)로 장 전개
+2. 유전 프로파일의 Fourier 변환
+3. 각 레이어에 대한 고유값 문제 풀기
+4. 레이어 간 경계 조건 일치
+5. 각 회절 차수의 파워 흐름 계산
 
-The result is a rigorous, efficient method for simulating periodic photonic structures.
+결과는 주기적 광결정 구조를 시뮬레이션하는 엄밀하고 효율적인 방법입니다.
 
-## Next Topics
+## 다음 주제
 
-- **[Mathematical Formulation](mathematics.md)**: Detailed equations and derivations
-- **[RCWA Algorithm](algorithm.md)**: Step-by-step computational procedure
-- **[Basic Concepts](../guide/concepts.md)**: Practical implementation guide
+- **[수학적 공식화](mathematics.md)**: 상세한 방정식 및 유도
+- **[RCWA 알고리즘](algorithm.md)**: 단계별 계산 절차
+- **[기본 개념](../guide/concepts.md)**: 실용적인 구현 가이드

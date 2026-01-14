@@ -1,45 +1,45 @@
-# Frequently Asked Questions (FAQ)
+# 자주 묻는 질문 (FAQ)
 
-## General Questions
+## 일반 질문
 
-### What is RCWA?
+### RCWA란 무엇인가요?
 
-Rigorous Coupled Wave Analysis (RCWA) is a semi-analytical method for solving Maxwell's equations in periodic structures. It expands electromagnetic fields in Fourier series and solves the resulting eigenvalue problems layer by layer. RCWA is exact (within numerical precision) and particularly efficient for periodic photonic structures.
+엄밀 결합파 해석(RCWA)은 주기 구조에서 Maxwell 방정식을 푸는 준해석적 방법입니다. 전자기장을 Fourier 급수로 전개하고 결과 고유값 문제를 레이어별로 풉니다. RCWA는 (수치 정밀도 내에서) 정확하며 주기적 광결정 구조에 특히 효율적입니다.
 
-### When should I use RCWA instead of FDTD or FEM?
+### FDTD나 FEM 대신 RCWA를 언제 사용해야 하나요?
 
-**Use RCWA when:**
+**RCWA 사용:**
 
-- Your structure has 2D periodicity (photonic crystals, gratings, metasurfaces)
-- You need spectral or angular response (frequency/angle sweeps)
-- You want fast simulations of periodic structures
-- You need far-field diffraction patterns
+- 구조가 2D 주기성을 가질 때 (광결정, 격자, 메타표면)
+- 스펙트럼 또는 각도 응답이 필요할 때 (주파수/각도 스윕)
+- 주기 구조의 빠른 시뮬레이션을 원할 때
+- 원거리장 회절 패턴이 필요할 때
 
-**Use FDTD/FEM when:**
+**FDTD/FEM 사용:**
 
-- Structure is aperiodic (isolated objects, random structures)
-- You need time-domain response
-- 3D arbitrary geometries without periodicity
-- Broadband simulations in single run (FDTD advantage)
+- 구조가 비주기적일 때 (고립 물체, 랜덤 구조)
+- 시간 영역 응답이 필요할 때
+- 주기성 없는 3D 임의 기하학
+- 단일 실행의 광대역 시뮬레이션 (FDTD의 장점)
 
-### What does "autoGradable" mean?
+### "autoGradable"은 무엇을 의미하나요?
 
-GRCWA integrates with [Autograd](https://github.com/HIPS/autograd), enabling automatic differentiation. This means you can compute gradients of any output (R, T, fields) with respect to any input (ε, frequency, angles, thickness) automatically, without deriving adjoint equations manually. This is essential for:
+GRCWA는 [Autograd](https://github.com/HIPS/autograd)와 통합되어 자동 미분을 가능하게 합니다. 이는 수동으로 수반 방정식을 유도하지 않고도 모든 입력(ε, 주파수, 각도, 두께)에 대한 모든 출력(R, T, 장)의 경사도를 자동으로 계산할 수 있음을 의미합니다. 이는 다음에 필수적입니다:
 
-- Topology optimization
-- Inverse design
-- Sensitivity analysis
-- Gradient-based optimization
+- 위상 최적화
+- 역설계
+- 민감도 분석
+- 경사도 기반 최적화
 
-## Installation & Setup
+## 설치 및 설정
 
-### How do I install GRCWA?
+### GRCWA를 어떻게 설치하나요?
 
 ```bash
 pip install grcwa
 ```
 
-For the latest development version:
+최신 개발 버전의 경우:
 
 ```bash
 git clone https://github.com/weiliangjinca/grcwa
@@ -47,170 +47,170 @@ cd grcwa
 pip install -e .
 ```
 
-### What are the dependencies?
+### 의존성은 무엇인가요?
 
-**Required:**
+**필수:**
 
 - Python ≥ 3.5
 - numpy
 - autograd
 
-**Optional:**
+**선택:**
 
-- nlopt (for optimization examples)
-- matplotlib (for visualization)
-- pytest (for testing)
+- nlopt (최적화 예제용)
+- matplotlib (시각화용)
+- pytest (테스트용)
 
-### How do I switch between NumPy and Autograd backends?
+### NumPy와 Autograd 백엔드 간에 어떻게 전환하나요?
 
 ```python
 import grcwa
 
-# NumPy backend (faster, no gradients)
+# NumPy 백엔드 (더 빠름, 경사도 없음)
 grcwa.set_backend('numpy')
 
-# Autograd backend (gradients enabled)
+# Autograd 백엔드 (경사도 활성화)
 grcwa.set_backend('autograd')
 ```
 
-**Important:** Set backend before creating `grcwa.obj` instances.
+**중요:** `grcwa.obj` 인스턴스를 생성하기 전에 백엔드를 설정하세요.
 
-## Usage Questions
+## 사용 질문
 
-### How do I choose the truncation order (nG)?
+### 절단 차수(nG)를 어떻게 선택하나요?
 
-**Rules of thumb:**
+**경험 법칙:**
 
-- Uniform layers: `nG = 11-51`
-- Smooth patterns: `nG = 51-101`
-- Sharp features: `nG = 101-301`
-- Very fine details: `nG = 301-501`
+- 균일 레이어: `nG = 11-51`
+- 매끄러운 패턴: `nG = 51-101`
+- 날카로운 특징: `nG = 101-301`
+- 매우 미세한 디테일: `nG = 301-501`
 
-**Always test convergence:**
+**항상 수렴을 테스트하세요:**
 
 ```python
 for nG in [51, 101, 201, 301]:
     obj = grcwa.obj(nG, ...)
-    # ... setup and solve ...
+    # ... 설정 및 풀이 ...
     R, T = obj.RT_Solve(normalize=1)
     print(f"nG={obj.nG}: R={R:.6f}, T={T:.6f}")
 ```
 
-### How many grid points (Nx, Ny) should I use?
+### 그리드 점(Nx, Ny)을 얼마나 사용해야 하나요?
 
-**Recommendations:**
+**권장사항:**
 
-- Smooth features: 50-100
-- Typical patterns: 200-400
-- Sharp edges: 400-500
-- Very fine details: 500-1000
+- 매끄러운 특징: 50-100
+- 일반적인 패턴: 200-400
+- 날카로운 가장자리: 400-500
+- 매우 미세한 디테일: 500-1000
 
-**Trade-off:** Higher resolution = more accurate but slower FFT.
+**트레이드오프:** 더 높은 해상도 = 더 정확하지만 더 느린 FFT.
 
-### What units should I use?
+### 어떤 단위를 사용해야 하나요?
 
-GRCWA uses **natural units** where $c = \varepsilon_0 = \mu_0 = 1$. You can use any consistent length unit:
+GRCWA는 $c = \varepsilon_0 = \mu_0 = 1$인 **자연 단위**를 사용합니다. 일관된 길이 단위를 사용할 수 있습니다:
 
 ```python
-# Example: all in μm
+# 예: 모두 μm 단위
 wavelength = 1.55  # μm
 freq = 1.0 / wavelength  # ≈ 0.645
 L1 = [0.5, 0]  # μm
 thickness = 0.3  # μm
 ```
 
-**Key:** All lengths must use the **same unit**.
+**핵심:** 모든 길이는 **동일한 단위**를 사용해야 합니다.
 
-### How do I convert wavelength to frequency?
+### 파장을 주파수로 어떻게 변환하나요?
 
-In natural units:
+자연 단위에서:
 
 $$
 f = \frac{c}{\lambda} = \frac{1}{\lambda}
 $$
 
 ```python
-wavelength = 1.5  # Your chosen unit
+wavelength = 1.5  # 선택한 단위
 freq = 1.0 / wavelength
 ```
 
-### What's the difference between P and S polarization?
+### P 편광과 S 편광의 차이는 무엇인가요?
 
-**P-polarization (TM):**
+**P-편광 (TM):**
 
-- Electric field in the plane of incidence
-- Magnetic field perpendicular to plane of incidence
-- Set `p_amp=1, s_amp=0`
+- 입사면 내의 전기장
+- 입사면에 수직인 자기장
+- `p_amp=1, s_amp=0` 설정
 
-**S-polarization (TE):**
+**S-편광 (TE):**
 
-- Electric field perpendicular to plane of incidence
-- Magnetic field in the plane of incidence
-- Set `p_amp=0, s_amp=1`
+- 입사면에 수직인 전기장
+- 입사면 내의 자기장
+- `p_amp=0, s_amp=1` 설정
 
-For normal incidence on isotropic materials, P and S give the same result.
+등방성 재료에 대한 수직 입사의 경우 P와 S는 동일한 결과를 제공합니다.
 
-### How do I define circular polarization?
+### 원형 편광을 어떻게 정의하나요?
 
-**Left circular polarization (LCP):**
+**좌원 편광 (LCP):**
 
 ```python
 obj.MakeExcitationPlanewave(p_amp=1, p_phase=0,
                              s_amp=1, s_phase=np.pi/2, order=0)
 ```
 
-**Right circular polarization (RCP):**
+**우원 편광 (RCP):**
 
 ```python
 obj.MakeExcitationPlanewave(p_amp=1, p_phase=0,
                              s_amp=1, s_phase=-np.pi/2, order=0)
 ```
 
-## Troubleshooting
+## 문제 해결
 
-### Why is R + T ≠ 1?
+### R + T ≠ 1인 이유는 무엇인가요?
 
-**Possible causes:**
+**가능한 원인:**
 
-1. **Insufficient truncation order:** Increase `nG`
-2. **Numerical instability:** Reduce layer thickness or use smaller `nG`
-3. **Absorbing material:** For lossy materials, $R + T < 1$ is correct (absorption = $1-R-T$)
-4. **Very high contrast:** Use more grid points (`Nx, Ny`)
+1. **불충분한 절단 차수:** `nG` 증가
+2. **수치 불안정성:** 레이어 두께 감소 또는 더 작은 `nG` 사용
+3. **흡수 재료:** 손실 재료의 경우 $R + T < 1$이 정확함 (흡수 = $1-R-T$)
+4. **매우 높은 대비:** 더 많은 그리드 점 사용 (`Nx, Ny`)
 
-**Fix:**
+**수정:**
 
 ```python
-# Test convergence
+# 수렴 테스트
 for nG in [101, 201, 301, 501]:
     obj = grcwa.obj(nG, ...)
-    # ... solve ...
+    # ... 풀기 ...
     R, T = obj.RT_Solve(normalize=1)
     print(f"nG={nG}: R+T={R+T:.6f}, error={(R+T-1):.2e}")
 ```
 
-### Why am I getting a singular matrix error?
+### 특이 행렬 오류가 발생하는 이유는 무엇인가요?
 
-**Causes:**
+**원인:**
 
-- Perfect normal incidence with no loss
-- Perfectly symmetric structure
+- 손실 없는 완전 수직 입사
+- 완전 대칭 구조
 
-**Fix:** Add tiny loss:
+**수정:** 작은 손실 추가:
 
 ```python
-Qabs = 1e8  # Very high Q-factor
+Qabs = 1e8  # 매우 높은 Q-팩터
 freq = freq * (1 + 1j / (2*Qabs))
 ```
 
-Or add tiny imaginary part to epsilon:
+또는 epsilon에 작은 허수부 추가:
 
 ```python
 epsilon = 4.0 + 1e-10j
 ```
 
-### My pattern looks wrong. How do I debug?
+### 내 패턴이 잘못 보입니다. 어떻게 디버그하나요?
 
-Use `Return_eps()` to visualize:
+`Return_eps()`를 사용하여 시각화:
 
 ```python
 eps_recon = obj.Return_eps(which_layer=1, Nx=200, Ny=200)
@@ -218,47 +218,47 @@ eps_recon = obj.Return_eps(which_layer=1, Nx=200, Ny=200)
 import matplotlib.pyplot as plt
 plt.imshow(eps_recon.T, origin='lower')
 plt.colorbar()
-plt.title('Reconstructed Dielectric Pattern')
+plt.title('재구성된 유전 패턴')
 plt.show()
 ```
 
-Compare with your input pattern to verify correctness.
+정확성을 확인하기 위해 입력 패턴과 비교하세요.
 
-### Results are very slow. How to speed up?
+### 결과가 매우 느립니다. 어떻게 속도를 높이나요?
 
-**Optimization strategies:**
+**최적화 전략:**
 
-1. **Reduce truncation order:** Try lower `nG` first
-2. **Use NumPy backend:** Faster than Autograd if no gradients needed
-3. **Reduce grid resolution:** Lower `Nx, Ny` if acceptable
-4. **Use uniform layers when possible:** Much faster than patterned
-5. **Parallelize parameter sweeps:**
+1. **절단 차수 감소:** 먼저 더 낮은 `nG` 시도
+2. **NumPy 백엔드 사용:** 경사도가 필요하지 않으면 Autograd보다 빠름
+3. **그리드 해상도 감소:** 허용 가능하면 더 낮은 `Nx, Ny`
+4. **가능한 경우 균일 레이어 사용:** 패턴보다 훨씬 빠름
+5. **매개변수 스윕 병렬화:**
 
 ```python
 from multiprocessing import Pool
 
 def compute(freq):
     obj = grcwa.obj(...)
-    # ... solve ...
+    # ... 풀기 ...
     return R, T
 
 with Pool(8) as p:
     results = p.map(compute, frequencies)
 ```
 
-### How do I handle anisotropic materials?
+### 이방성 재료를 어떻게 처리하나요?
 
-For anisotropic dielectric tensors, provide a list of 3 components:
+이방성 유전 텐서의 경우 3개 성분의 리스트 제공:
 
 ```python
-# Uniaxial material with εxx = εyy ≠ εzz
+# εxx = εyy ≠ εzz인 일축 재료
 eps_xx = 4.0
 eps_yy = 4.0
 eps_zz = 6.0
 
 eps_tensor = [eps_xx, eps_yy, eps_zz]
 
-# For grid layer
+# 그리드 레이어의 경우
 eps_grid_xx = np.ones((Nx, Ny)) * eps_xx
 eps_grid_yy = np.ones((Nx, Ny)) * eps_yy
 eps_grid_zz = np.ones((Nx, Ny)) * eps_zz
@@ -267,9 +267,9 @@ eps_all = [eps_grid_xx.flatten(), eps_grid_yy.flatten(), eps_grid_zz.flatten()]
 obj.GridLayer_geteps(eps_all)
 ```
 
-## Advanced Usage
+## 고급 사용
 
-### How do I do topology optimization?
+### 위상 최적화를 어떻게 하나요?
 
 ```python
 import grcwa
@@ -286,12 +286,12 @@ def objective(epsilon):
     obj.GridLayer_geteps(epsilon.flatten())
     obj.MakeExcitationPlanewave(1, 0, 0, 0, 0)
     R, T = obj.RT_Solve(normalize=1)
-    return -R  # Maximize reflection
+    return -R  # 반사 최대화
 
-# Compute gradient
+# 경사도 계산
 grad_obj = grad(objective)
 
-# Use optimizer (e.g., NLOPT, scipy.optimize)
+# 최적화기 사용 (예: NLOPT, scipy.optimize)
 import nlopt
 
 def nlopt_objective(x, grad_array):
@@ -299,75 +299,75 @@ def nlopt_objective(x, grad_array):
         grad_array[:] = grad_obj(x)
     return objective(x)
 
-# Setup NLOPT
+# NLOPT 설정
 opt = nlopt.opt(nlopt.LD_MMA, Nx*Ny)
 opt.set_min_objective(nlopt_objective)
 opt.set_lower_bounds(1.0)
 opt.set_upper_bounds(12.0)
 
-# Initial guess
+# 초기 추정
 epsilon_init = np.ones(Nx*Ny) * 6.0
 
-# Optimize
+# 최적화
 epsilon_opt = opt.optimize(epsilon_init)
 ```
 
-### Can I simulate isolated objects?
+### 고립된 물체를 시뮬레이션할 수 있나요?
 
-RCWA requires periodicity. For isolated objects:
+RCWA는 주기성을 요구합니다. 고립 물체의 경우:
 
-1. **Use large unit cell** (super-cell approach):
+1. **큰 단위 셀 사용** (슈퍼셀 접근):
 
 ```python
-# Object size: 1 μm
-# Use 10 μm × 10 μm unit cell
+# 물체 크기: 1 μm
+# 10 μm × 10 μm 단위 셀 사용
 L1 = [10, 0]
 L2 = [0, 10]
 
-# Place object at center, surrounded by vacuum
+# 중앙에 물체 배치, 진공으로 둘러싸기
 ```
 
-2. **Check convergence** with increasing cell size until results stabilize
+2. **수렴 확인**: 셀 크기를 증가시키며 결과가 안정될 때까지
 
-### How do I get reflection/transmission coefficients (not just powers)?
+### 반사/투과 계수를 어떻게 얻나요 (파워만이 아닌)?
 
-The amplitudes are stored internally. Access via:
+진폭은 내부에 저장됩니다. 다음을 통해 액세스:
 
 ```python
-# After solving
+# 풀이 후
 amplitudes_in, amplitudes_out = obj.GetAmplitudes(layer=0, z_offset=0)
 ```
 
-For reflection coefficients:
+반사 계수의 경우:
 
 ```python
-# Reflection coefficients for each order
-r_coeffs = amplitudes_out[0:obj.nG]  # Backward propagating in input region
+# 각 차수의 반사 계수
+r_coeffs = amplitudes_out[0:obj.nG]  # 입력 영역에서 후방 전파
 ```
 
-### How do I compute absorption?
+### 흡수를 어떻게 계산하나요?
 
-For lossy materials:
+손실 재료의 경우:
 
 ```python
 R, T = obj.RT_Solve(normalize=1)
-A = 1 - R - T  # Absorption
+A = 1 - R - T  # 흡수
 ```
 
-Or use volume integral of $\text{Im}(\varepsilon)|E|^2$:
+또는 $\text{Im}(\varepsilon)|E|^2$의 부피 적분 사용:
 
 ```python
 absorption = obj.Volume_integral(which_layer, Mx, My, Mz, normalize=1)
 ```
 
-### Can I use GRCWA for 3D photonic crystals?
+### 3D 광결정에 GRCWA를 사용할 수 있나요?
 
-RCWA assumes periodicity in 2D (xy-plane) and stacking in z. For 3D photonic crystals:
+RCWA는 2D (xy-평면)의 주기성과 z의 적층을 가정합니다. 3D 광결정의 경우:
 
-- ✅ **Photonic crystal slabs** (2D periodic, finite in z): Yes
-- ❌ **3D bulk photonic crystals** (periodic in xyz): No, use plane-wave expansion or other methods
+- ✅ **광결정 슬랩** (2D 주기, z에서 유한): 예
+- ❌ **3D 벌크 광결정** (xyz에서 주기): 아니오, 평면파 전개 또는 다른 방법 사용
 
-### How do I cite GRCWA?
+### GRCWA를 어떻게 인용하나요?
 
 ```bibtex
 @article{Jin2020,
@@ -382,34 +382,34 @@ RCWA assumes periodicity in 2D (xy-plane) and stacking in z. For 3D photonic cry
 }
 ```
 
-## Common Error Messages
+## 일반적인 오류 메시지
 
 ### "IndexError: index out of range"
 
-**Cause:** Mismatch between number of patterned layers and epsilon arrays provided.
+**원인:** 패턴 레이어 수와 제공된 epsilon 배열 간의 불일치.
 
-**Fix:** Ensure `epsilon.flatten()` has correct total length.
+**수정:** `epsilon.flatten()`의 총 길이가 올바른지 확인.
 
 ### "ValueError: operands could not be broadcast together"
 
-**Cause:** Array shape mismatch in pattern definition.
+**원인:** 패턴 정의에서 배열 형상 불일치.
 
-**Fix:** Check that pattern has shape `(Nx, Ny)` and use `indexing='ij'` in meshgrid.
+**수정:** 패턴의 형상이 `(Nx, Ny)`이고 meshgrid에서 `indexing='ij'` 사용 확인.
 
 ### "LinAlgError: Singular matrix"
 
-**Cause:** Numerical singularity, often at normal incidence with no loss.
+**원인:** 수치 특이점, 종종 손실 없는 수직 입사에서.
 
-**Fix:** Add tiny loss:
+**수정:** 작은 손실 추가:
 
 ```python
 freq = freq * (1 + 1e-10j)
 ```
 
-## Still Have Questions?
+## 여전히 질문이 있으신가요?
 
-- Check the [Troubleshooting Guide](troubleshooting.md)
-- Read the [Tutorials](../tutorials/tutorial1.md)
-- Browse [Examples](../examples/gallery.md)
-- Open an issue on [GitHub](https://github.com/weiliangjinca/grcwa/issues)
-- Contact: jwlaaa@gmail.com
+- [문제 해결 가이드](troubleshooting.md) 확인
+- [튜토리얼](../tutorials/tutorial1.md) 읽기
+- [예제](../examples/gallery.md) 둘러보기
+- [GitHub](https://github.com/weiliangjinca/grcwa/issues)에 이슈 열기
+- 연락처: jwlaaa@gmail.com
