@@ -422,7 +422,7 @@ for i in range(obj.nG):
 
 ## Field Methods
 
-See [Field Methods](fields.md) for detailed documentation of:
+Field computation methods:
 
 - `GetAmplitudes()`: Get mode amplitudes
 - `Solve_FieldFourier()`: Compute fields in Fourier space
@@ -570,7 +570,6 @@ plt.show()
 
 ## See Also
 
-- [Layer Methods](layers.md): Detailed layer management
-- [Solver Methods](solver.md): Advanced solving options
-- [Field Methods](fields.md): Field analysis and visualization
 - [Tutorials](../tutorials/tutorial1.md): Step-by-step examples
+- [Examples Gallery](../examples/gallery.md): Browse more examples
+- [FAQ](../reference/faq.md): Frequently asked questions

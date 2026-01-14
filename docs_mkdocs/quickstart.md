@@ -396,5 +396,4 @@ obj.MakeExcitationPlanewave(p_amp=1, p_phase=0, s_amp=1, s_phase=-np.pi/2, order
 ## 도움이 필요하신가요?
 
 - [FAQ](reference/faq.md) 확인
-- [문제 해결](reference/troubleshooting.md) 읽기
 - [전체 예제](examples/gallery.md) 보기
