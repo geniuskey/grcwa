@@ -61,6 +61,13 @@ $$
 
 여기서 $m, n \in \mathbb{Z}$이고 $\mathbf{L}_1, \mathbf{L}_2$는 격자 벡터입니다.
 
+!!! note "GRCWA에서"
+    격자 벡터는 시뮬레이션 객체 생성 시 정의됩니다:
+    ```python
+    obj = grcwa.obj(nG, L1=[a, 0], L2=[0, b], freq, theta, phi)
+    ```
+    여기서 `L1`, `L2`는 격자 벡터 $\mathbf{L}_1, \mathbf{L}_2$입니다.
+
 **격자 예시:**
 
 - **정사각**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = a\hat{y}$
@@ -90,6 +97,17 @@ $$
 $$
 \mathbf{G}_{mn} = m\mathbf{K}_1 + n\mathbf{K}_2, \quad m,n \in \mathbb{Z}
 $$
+
+!!! note "GRCWA에서"
+    역격자 벡터는 `Init_Setup()` 호출 시 자동으로 계산됩니다:
+    ```python
+    obj.Init_Setup()  # 역격자 계산
+
+    # 접근:
+    K1 = obj.Lk1  # 역격자 벡터 1
+    K2 = obj.Lk2  # 역격자 벡터 2
+    G_indices = obj.G  # (m,n) 인덱스 배열
+    ```
 
 ## Bloch 정리
 
@@ -149,6 +167,13 @@ $$
 $$
 k_{y,mn} = k_{y0} + G_{y,mn}
 $$
+
+!!! note "GRCWA에서"
+    각 회절 차수의 파동 벡터는 `Init_Setup()` 후 접근할 수 있습니다:
+    ```python
+    kx_all = obj.kx  # 모든 차수의 kx, 형상: (nG,)
+    ky_all = obj.ky  # 모든 차수의 ky, 형상: (nG,)
+    ```
 
 ### 파동 벡터의 Z-성분
 
@@ -212,6 +237,16 @@ $$
 
 **타원 편광**: 일반적인 경우
 
+!!! note "GRCWA에서"
+    평면파 여기는 `MakeExcitationPlanewave()`로 정의됩니다:
+    ```python
+    # P-편광
+    obj.MakeExcitationPlanewave(p_amp=1, p_phase=0, s_amp=0, s_phase=0)
+
+    # 좌원 편광
+    obj.MakeExcitationPlanewave(p_amp=1, p_phase=0, s_amp=1, s_phase=np.pi/2)
+    ```
+
 ## 에너지 및 파워 흐름
 
 ### Poynting 벡터
@@ -252,6 +287,18 @@ T = \sum_{mn} \frac{P_{mn}^{\text{trans}}}{P_{\text{inc}}}
 $$
 
 손실 없는 구조의 경우: $R + T = 1$ (에너지 보존)
+
+!!! note "GRCWA에서"
+    반사 및 투과는 `RT_Solve()`로 계산됩니다:
+    ```python
+    # 전체 R, T
+    R, T = obj.RT_Solve(normalize=1)
+    print(f"R+T = {R+T}")  # 에너지 보존 확인
+
+    # 차수별 R, T
+    Ri, Ti = obj.RT_Solve(normalize=1, byorder=1)
+    print(f"0차 반사: {Ri[0]}")
+    ```
 
 ## 경계 조건
 
@@ -299,6 +346,11 @@ $$
 - 모드는 전방/후방 전파 평면파
 - 빠르고 안정적
 
+!!! note "GRCWA에서"
+    ```python
+    obj.Add_LayerUniform(thickness, epsilon)
+    ```
+
 ### 패턴 레이어
 
 $\varepsilon(x,y,z) = \varepsilon(x,y)$ (z-불변)를 갖는 레이어의 경우:
@@ -306,6 +358,15 @@ $\varepsilon(x,y,z) = \varepsilon(x,y)$ (z-불변)를 갖는 레이어의 경우
 - 고유값 문제를 수치적으로 풀어야 함
 - 모드는 서로 다른 $k_z$를 갖는 Bloch 파
 - 계산 비용이 더 높음
+
+!!! note "GRCWA에서"
+    ```python
+    # 패턴 레이어 추가
+    obj.Add_LayerGrid(thickness, Nx, Ny)
+
+    # 나중에 유전 패턴 입력
+    obj.GridLayer_geteps(epsilon_pattern.flatten())
+    ```
 
 ### 레이어 적층
 
