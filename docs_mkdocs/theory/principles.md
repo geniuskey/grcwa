@@ -74,6 +74,10 @@ $$
 - **직사각**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = b\hat{y}$
 - **육각**: $\mathbf{L}_1 = a\hat{x}$, $\mathbf{L}_2 = a(\frac{1}{2}\hat{x} + \frac{\sqrt{3}}{2}\hat{y})$
 
+![실공간 격자 구조](../assets/images/lattice_structure.png)
+
+*실공간 격자: 격자 벡터 $\mathbf{L}_1$, $\mathbf{L}_2$와 단위 셀이 보입니다.*
+
 ### 역격자
 
 역격자 벡터는 다음을 만족합니다:
@@ -108,6 +112,10 @@ $$
     K2 = obj.Lk2  # 역격자 벡터 2
     G_indices = obj.G  # (m,n) 인덱스 배열
     ```
+
+![역격자 공간](../assets/images/reciprocal_lattice.png)
+
+*역격자 공간: 회절 차수 $(m,n)$과 역격자 벡터 $\mathbf{G}_1$, $\mathbf{G}_2$가 표시되어 있습니다. 빨간 점선 원은 절단 영역(nG)을 나타냅니다.*
 
 ## Bloch 정리
 
@@ -209,6 +217,10 @@ $$
 
 낮은 주파수(긴 파장)에서는 대부분의 차수가 소산됩니다. 높은 주파수에서는 많은 차수가 전파할 수 있습니다.
 
+![회절 차수](../assets/images/diffraction_orders.png)
+
+*회절 차수: 주기 격자에 의해 생성된 다양한 회절 차수 $(m)$가 보입니다. 각 차수는 서로 다른 각도로 전파됩니다.*
+
 ## 편광
 
 ### S 및 P 편광
@@ -246,6 +258,10 @@ $$
     # 좌원 편광
     obj.MakeExcitationPlanewave(p_amp=1, p_phase=0, s_amp=1, s_phase=np.pi/2)
     ```
+
+![입사각 및 편광](../assets/images/incidence_geometry.png)
+
+*입사 기하학: 극각 $\theta$, 방위각 $\phi$, 그리고 s-편광(TE) 및 p-편광(TM) 방향이 표시되어 있습니다.*
 
 ## 에너지 및 파워 흐름
 
@@ -387,6 +403,10 @@ RCWA는 구조를 스택으로 취급합니다:
 ```
 
 각 레이어는 독립적으로 풀린 다음 경계 조건을 통해 결합됩니다.
+
+![다층 구조](../assets/images/layer_stack.png)
+
+*다층 구조: 여러 레이어로 구성된 RCWA 시뮬레이션 구조. 입사파, 반사파(R), 투과파(T)가 표시되어 있습니다. 각 레이어는 균일하거나 패턴을 가질 수 있습니다.*
 
 ## 절단 및 수렴
 
