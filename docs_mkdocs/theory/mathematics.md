@@ -144,6 +144,16 @@ $$
 
 고유값 $q$는 고유모드의 파동 벡터 $z$-성분입니다.
 
+!!! note "GRCWA에서"
+    고유값 문제는 `Init_Setup()` 호출 시 내부적으로 풀립니다:
+    ```python
+    obj.Init_Setup()  # 모든 레이어의 고유값 및 고유벡터 계산
+
+    # 내부적으로 접근 가능 (고급 사용):
+    # obj.q_list - 각 레이어의 고유값
+    # obj.phi_list - 각 레이어의 고유벡터
+    ```
+
 ## 컨볼루션 행렬
 
 ### 유전 Fourier 변환
@@ -165,6 +175,17 @@ $$
 $$
 \varepsilon_{mn} = \text{FFT2D}[\varepsilon(x,y)]
 $$
+
+!!! note "GRCWA에서"
+    유전 패턴은 실공간 그리드에서 정의되고 내부적으로 FFT됩니다:
+    ```python
+    # 실공간 유전 패턴 생성
+    eps_grid = np.ones((Nx, Ny)) * 12.0  # 실리콘
+    eps_grid[hole_mask] = 1.0  # 공기 홀
+
+    # GRCWA가 자동으로 FFT 수행
+    obj.GridLayer_geteps(eps_grid.flatten())
+    ```
 
 ### Fourier 공간의 컨볼루션
 
@@ -320,6 +341,16 @@ $$
 
 정규화는 손실 없는 구조에 대해 $R + T = 1$을 보장합니다.
 
+!!! note "GRCWA에서"
+    정규화된 반사 및 투과 계산:
+    ```python
+    # 정규화된 전체 R, T
+    R, T = obj.RT_Solve(normalize=1)
+
+    # 정규화되지 않은 원시 값
+    R_raw, T_raw = obj.RT_Solve(normalize=0)
+    ```
+
 ## 장 재구성
 
 ### Fourier 공간 장
@@ -340,6 +371,21 @@ $$
 \mathbf{E}(x_i, y_j, z) = \text{IFFT2D}[\mathbf{E}_{mn}(z)]
 $$
 
+!!! note "GRCWA에서"
+    실공간 장 계산:
+    ```python
+    # Fourier 공간 장 (모든 회절 차수)
+    [Ex_mn, Ey_mn, Ez_mn], [Hx_mn, Hy_mn, Hz_mn] = \
+        obj.Solve_FieldFourier(which_layer, z_offset)
+
+    # 실공간 그리드의 장
+    [Ex, Ey, Ez], [Hx, Hy, Hz] = \
+        obj.Solve_FieldOnGrid(which_layer, z_offset, [Nx, Ny])
+
+    # 강도 계산
+    I = np.abs(Ex)**2 + np.abs(Ey)**2 + np.abs(Ez)**2
+    ```
+
 ### 부피 적분
 
 부피 적분 계산(예: 에너지 밀도)의 경우:
@@ -349,6 +395,13 @@ $$
 $$
 
 여기서 $V_{\text{unit}} = A_{\text{cell}} \cdot d$는 단위 셀 부피입니다.
+
+!!! note "GRCWA에서"
+    부피 적분은 `Volume_integral()`로 계산할 수 있습니다:
+    ```python
+    # 레이어에서 장 에너지 밀도 적분
+    energy = obj.Volume_integral(which_layer, integrand='E')
+    ```
 
 ## 수치 안정성
 
