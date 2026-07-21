@@ -497,11 +497,325 @@ def generate_diffraction_orders():
     print(f"✓ Generated: {output_dir}/diffraction_orders.png")
 
 
+def generate_fourier_expansion():
+    """Generate Fourier series expansion visualization"""
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    axes = axes.flatten()
+
+    # Original square wave function
+    x = np.linspace(0, 2*np.pi, 1000)
+    def square_wave(x):
+        return np.where(np.mod(x, 2*np.pi) < np.pi, 1, -1)
+
+    original = square_wave(x)
+
+    # Different numbers of Fourier terms
+    n_terms_list = [1, 3, 7, 15]
+
+    for idx, n_terms in enumerate(n_terms_list):
+        ax = axes[idx]
+
+        # Compute Fourier series approximation
+        fourier_approx = np.zeros_like(x)
+        for n in range(1, n_terms + 1, 2):  # Only odd harmonics for square wave
+            fourier_approx += (4 / (n * np.pi)) * np.sin(n * x)
+
+        # Plot
+        ax.plot(x, original, 'k-', linewidth=2, label='Original', alpha=0.3)
+        ax.plot(x, fourier_approx, 'b-', linewidth=2.5, label=f'Fourier (n={n_terms})')
+        ax.set_xlabel('x', fontsize=12)
+        ax.set_ylabel('f(x)', fontsize=12)
+        ax.set_title(f'N = {n_terms} terms', fontsize=13, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=10)
+        ax.set_ylim(-1.5, 1.5)
+
+    fig.suptitle('Fourier Series Convergence', fontsize=16, fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/fourier_expansion.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"✓ Generated: {output_dir}/fourier_expansion.png")
+
+
+def generate_propagating_evanescent():
+    """Generate propagating vs evanescent modes visualization"""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+    # Propagating mode (real kz)
+    z = np.linspace(0, 5, 200)
+    kz_real = 2.0
+    wave_prop = np.exp(1j * kz_real * z)
+
+    ax1.plot(z, np.real(wave_prop), 'b-', linewidth=2.5, label='Re[E]')
+    ax1.plot(z, np.imag(wave_prop), 'r--', linewidth=2.5, label='Im[E]')
+    ax1.axhline(y=0, color='k', linestyle='-', alpha=0.3)
+    ax1.set_xlabel('z (depth)', fontsize=13)
+    ax1.set_ylabel('Electric Field', fontsize=13)
+    ax1.set_title('Propagating Mode (Real $k_z$)', fontsize=14, fontweight='bold')
+    ax1.legend(fontsize=11)
+    ax1.grid(True, alpha=0.3)
+    ax1.text(2.5, 0.7, '$k_z = $ real\nCarries power', fontsize=11,
+            bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
+
+    # Evanescent mode (imaginary kz)
+    kz_imag = 1.5
+    wave_evan = np.exp(-kz_imag * z)
+
+    ax2.plot(z, wave_evan, 'b-', linewidth=2.5, label='|E|')
+    ax2.fill_between(z, 0, wave_evan, alpha=0.3, color='blue')
+    ax2.axhline(y=0, color='k', linestyle='-', alpha=0.3)
+    ax2.set_xlabel('z (depth)', fontsize=13)
+    ax2.set_ylabel('Electric Field Magnitude', fontsize=13)
+    ax2.set_title('Evanescent Mode (Imaginary $k_z$)', fontsize=14, fontweight='bold')
+    ax2.legend(fontsize=11)
+    ax2.grid(True, alpha=0.3)
+    ax2.text(2.5, 0.5, '$k_z = $ imaginary\nExponential decay\nNo power flow', fontsize=11,
+            bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.8))
+
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/propagating_evanescent.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"✓ Generated: {output_dir}/propagating_evanescent.png")
+
+
+def generate_boundary_conditions():
+    """Generate boundary conditions illustration"""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+    # Tangential components (continuous)
+    y = np.linspace(-2, 2, 100)
+
+    # Interface at x=0
+    E_tang_left = np.ones_like(y[y < 0]) * 1.0
+    E_tang_right = np.ones_like(y[y >= 0]) * 1.0
+
+    ax1.axvline(x=0, color='k', linewidth=3, label='Interface')
+    ax1.fill_betweenx(y, -2, 0, alpha=0.2, color='blue', label='Medium 1')
+    ax1.fill_betweenx(y, 0, 2, alpha=0.2, color='red', label='Medium 2')
+
+    # Draw tangential field (continuous)
+    ax1.plot([-1.5, -0.05], [0, 0], 'b-', linewidth=3)
+    ax1.plot([0.05, 1.5], [0, 0], 'r-', linewidth=3)
+    ax1.plot([-0.05, 0.05], [0, 0], 'g-', linewidth=4, label='$E_{\\parallel}$ continuous')
+
+    # Arrows showing field direction
+    ax1.arrow(-1, 0, 0.3, 0, head_width=0.2, head_length=0.1, fc='blue', ec='blue')
+    ax1.arrow(1, 0, 0.3, 0, head_width=0.2, head_length=0.1, fc='red', ec='red')
+
+    ax1.set_xlim(-2, 2)
+    ax1.set_ylim(-2, 2)
+    ax1.set_xlabel('x', fontsize=13)
+    ax1.set_ylabel('y', fontsize=13)
+    ax1.set_title('Tangential Component:\n$\\mathbf{n} \\times (\\mathbf{E}_1 - \\mathbf{E}_2) = 0$',
+                  fontsize=13, fontweight='bold')
+    ax1.legend(loc='upper right', fontsize=10)
+    ax1.set_aspect('equal')
+
+    # Normal components (discontinuous for E, continuous for D)
+    ax2.axvline(x=0, color='k', linewidth=3, label='Interface')
+    ax2.fill_betweenx(y, -2, 0, alpha=0.2, color='blue', label='$\\varepsilon_1 = 1$')
+    ax2.fill_betweenx(y, 0, 2, alpha=0.2, color='red', label='$\\varepsilon_2 = 4$')
+
+    # Draw normal field (discontinuous in E)
+    E1_normal = 1.0
+    E2_normal = 0.25  # D continuous, so E2 = D/eps2 = E1*eps1/eps2
+
+    ax2.arrow(-1, -1.5, 0, E1_normal*0.8, head_width=0.15, head_length=0.1,
+             fc='blue', ec='blue', linewidth=2.5, label=f'$E_1^\\perp$ = {E1_normal}')
+    ax2.arrow(1, -1.5, 0, E2_normal*0.8, head_width=0.15, head_length=0.1,
+             fc='red', ec='red', linewidth=2.5, label=f'$E_2^\\perp$ = {E2_normal}')
+
+    ax2.text(-1, 1, '$D_1^\\perp = \\varepsilon_1 E_1^\\perp = 1.0$', fontsize=10,
+            bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
+    ax2.text(0.3, 1, '$D_2^\\perp = \\varepsilon_2 E_2^\\perp = 1.0$', fontsize=10,
+            bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.8))
+
+    ax2.set_xlim(-2, 2)
+    ax2.set_ylim(-2, 2)
+    ax2.set_xlabel('x', fontsize=13)
+    ax2.set_ylabel('z', fontsize=13)
+    ax2.set_title('Normal Component:\n$\\mathbf{n} \\cdot (\\varepsilon_1\\mathbf{E}_1 - \\varepsilon_2\\mathbf{E}_2) = 0$',
+                  fontsize=13, fontweight='bold')
+    ax2.legend(loc='upper right', fontsize=9)
+    ax2.set_aspect('equal')
+
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/boundary_conditions.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"✓ Generated: {output_dir}/boundary_conditions.png")
+
+
+def generate_eigenmode_concept():
+    """Generate eigenmode concept diagram"""
+    fig = plt.figure(figsize=(12, 8))
+
+    # Create 3D plot
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Create layer
+    z_layer = np.array([0, 0, 1, 1])
+    x_layer = np.array([0, 2, 2, 0])
+    y_layer = np.array([0, 0, 0, 0])
+
+    # Draw multiple layers to show the structure
+    for i in range(3):
+        z_offset = i * 1.5
+        verts = [list(zip([0, 2, 2, 0], [0, 0, 1, 1], [z_offset]*4)),
+                 list(zip([0, 2, 2, 0], [0, 0, 1, 1], [z_offset+1]*4))]
+
+        # Draw top and bottom faces
+        for vert in verts:
+            poly = Poly3DCollection([vert], alpha=0.3, facecolor='lightblue',
+                                   edgecolor='black', linewidth=2)
+            ax.add_collection3d(poly)
+
+    # Draw eigenmodes (sinusoidal patterns)
+    x = np.linspace(0, 2, 50)
+    z = np.linspace(0, 4, 100)
+
+    # Mode 1: forward propagating
+    for i, z_val in enumerate(np.linspace(0.5, 3.5, 6)):
+        y_wave = 0.3 * np.sin(2 * np.pi * x) + 0.5
+        z_wave = np.ones_like(x) * z_val
+        ax.plot(x, y_wave, z_wave, 'r-', linewidth=2, alpha=0.7)
+
+    ax.text(1, 0.8, 2, 'Eigenmodes\n$\\psi_n(x,y) e^{ik_{z,n}z}$', fontsize=12,
+           bbox=dict(boxstyle='round', facecolor='yellow', alpha=0.7))
+
+    # Add arrows showing propagation
+    ax.quiver(0.5, 0.5, 1, 0, 0, 1, color='red', arrow_length_ratio=0.3,
+             linewidth=2.5, label='Forward mode')
+    ax.quiver(1.5, 0.5, 3, 0, 0, -1, color='blue', arrow_length_ratio=0.3,
+             linewidth=2.5, label='Backward mode')
+
+    ax.set_xlabel('X', fontsize=12)
+    ax.set_ylabel('Y', fontsize=12)
+    ax.set_zlabel('Z (propagation)', fontsize=12)
+    ax.set_title('Eigenmode Propagation in Patterned Layer', fontsize=15, fontweight='bold')
+    ax.legend(loc='upper right', fontsize=10)
+    ax.view_init(elev=20, azim=45)
+
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/eigenmode_concept.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"✓ Generated: {output_dir}/eigenmode_concept.png")
+
+
+def generate_convergence_test():
+    """Generate convergence test visualization"""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+    # Simulate convergence data
+    nG_values = np.array([11, 21, 51, 101, 151, 201, 301, 401, 501])
+
+    # Reflection converges faster (smoother structure)
+    R_values = 0.35 + 0.15 * np.exp(-nG_values / 80) + 0.02 * np.random.randn(len(nG_values))
+    R_values = np.clip(R_values, 0, 1)
+
+    # Transmission
+    T_values = 1 - R_values - 0.05 * np.exp(-nG_values / 100)
+    T_values = np.clip(T_values, 0, 1)
+
+    ax1.plot(nG_values, R_values, 'bo-', linewidth=2.5, markersize=8, label='Reflectance (R)')
+    ax1.plot(nG_values, T_values, 'rs-', linewidth=2.5, markersize=8, label='Transmittance (T)')
+    ax1.plot(nG_values, R_values + T_values, 'g^--', linewidth=2, markersize=7,
+            label='R + T (Energy conservation)')
+    ax1.axhline(y=1, color='k', linestyle=':', alpha=0.5, label='Perfect conservation')
+
+    ax1.set_xlabel('Number of Fourier orders (nG)', fontsize=13)
+    ax1.set_ylabel('Value', fontsize=13)
+    ax1.set_title('Convergence with nG', fontsize=14, fontweight='bold')
+    ax1.legend(fontsize=10)
+    ax1.grid(True, alpha=0.3)
+    ax1.set_ylim(0, 1.1)
+
+    # Computation time vs nG
+    time_values = (nG_values / 11) ** 2.5 * 0.1  # Roughly O(nG^2.5)
+
+    ax2.loglog(nG_values, time_values, 'mo-', linewidth=2.5, markersize=8)
+    ax2.set_xlabel('Number of Fourier orders (nG)', fontsize=13)
+    ax2.set_ylabel('Computation Time (s)', fontsize=13)
+    ax2.set_title('Computational Cost', fontsize=14, fontweight='bold')
+    ax2.grid(True, alpha=0.3, which='both')
+    ax2.text(150, 50, 'Scaling: $\\sim O(nG^{2.5})$', fontsize=11,
+            bbox=dict(boxstyle='round', facecolor='lightpink', alpha=0.8))
+
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/convergence_test.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"✓ Generated: {output_dir}/convergence_test.png")
+
+
+def generate_smatrix_concept():
+    """Generate S-matrix concept diagram"""
+    fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+
+    # Draw the structure (box representing the system)
+    structure = Rectangle((3, 3), 4, 3, facecolor='lightblue',
+                         edgecolor='black', linewidth=3, alpha=0.5)
+    ax.add_patch(structure)
+    ax.text(5, 4.5, 'RCWA\nStructure', ha='center', fontsize=14, fontweight='bold')
+
+    # Input fields (left side)
+    # Forward propagating (incident)
+    ax.arrow(0.5, 5, 2, 0, head_width=0.3, head_length=0.3,
+            fc='red', ec='red', linewidth=3)
+    ax.text(1.5, 5.7, '$a^+$ (Incident)', fontsize=12, color='red', fontweight='bold')
+
+    # Backward propagating (from right, entering left)
+    ax.arrow(2.5, 3.5, -2, 0, head_width=0.3, head_length=0.3,
+            fc='blue', ec='blue', linewidth=2, alpha=0.7)
+    ax.text(1.5, 2.8, '$a^-$', fontsize=12, color='blue', fontweight='bold')
+
+    # Output fields (left side)
+    # Reflected (backward propagating)
+    ax.arrow(2.5, 5.5, -2, 0, head_width=0.3, head_length=0.3,
+            fc='green', ec='green', linewidth=2.5)
+    ax.text(0.8, 6.2, '$b^-$ (Reflected)', fontsize=12, color='green', fontweight='bold')
+
+    # Output fields (right side)
+    # Transmitted (forward propagating)
+    ax.arrow(7.5, 4.5, 2, 0, head_width=0.3, head_length=0.3,
+            fc='orange', ec='orange', linewidth=2.5)
+    ax.text(8, 5.2, '$b^+$ (Transmitted)', fontsize=12, color='orange', fontweight='bold')
+
+    # Backward propagating (from right)
+    ax.arrow(9.5, 4, -2, 0, head_width=0.3, head_length=0.3,
+            fc='purple', ec='purple', linewidth=2, alpha=0.7)
+    ax.text(8.5, 3.3, '$a^-$', fontsize=12, color='purple', fontweight='bold')
+
+    # S-matrix equations (simplified without pmatrix)
+    eq_text = (
+        'S-Matrix Relation:\n\n'
+        '[b⁻]   [S₁₁  S₁₂]  [a⁺]\n'
+        '[b⁺] = [S₂₁  S₂₂]  [a⁻]\n\n'
+        'S₁₁: Reflection from left\n'
+        'S₂₁: Transmission left→right\n'
+        'S₁₂: Transmission right→left\n'
+        'S₂₂: Reflection from right'
+    )
+
+    ax.text(5, 1, eq_text, ha='center', fontsize=12,
+           bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.9))
+
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 7)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_title('S-Matrix Formulation', fontsize=16, fontweight='bold', pad=20)
+
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/smatrix_concept.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"✓ Generated: {output_dir}/smatrix_concept.png")
+
+
 # Generate all figures
 if __name__ == '__main__':
     print("Generating documentation figures...")
     print()
 
+    # Basic structural diagrams
     generate_lattice_structure()
     generate_reciprocal_lattice()
     generate_layer_stack()
@@ -509,6 +823,14 @@ if __name__ == '__main__':
     generate_sensor_structure()
     generate_incidence_geometry()
     generate_diffraction_orders()
+
+    # Theory concept diagrams
+    generate_fourier_expansion()
+    generate_propagating_evanescent()
+    generate_boundary_conditions()
+    generate_eigenmode_concept()
+    generate_convergence_test()
+    generate_smatrix_concept()
 
     print()
     print(f"All figures generated successfully in {output_dir}/")
